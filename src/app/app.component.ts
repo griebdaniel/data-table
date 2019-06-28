@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import * as Lodash from 'lodash';
-import { TableInfo } from './table/table-info';
-import { EditableType } from './table/editable-value/editable-type';
+// import { TableInfo } from './table/table-info';
+// import { EditableType } from './table/editable-value/editable-type';
+
+import { EditableType, TableInfo } from 'data-table';
 
 @Component({
   selector: 'app-root',
