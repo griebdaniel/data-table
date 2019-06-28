@@ -1,0 +1,9 @@
+table {
+  width: 100%;
+}
+
+.edit-active {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+}
