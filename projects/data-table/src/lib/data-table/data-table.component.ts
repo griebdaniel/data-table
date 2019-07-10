@@ -29,14 +29,40 @@ export class DataTableComponent implements OnInit {
   @ViewChildren(EditableValueComponent) editableValues: QueryList<EditableValueComponent>;
   @Output() tableChange = new EventEmitter<TableChange>();
 
+
+  initialValues: Map<string, any>;
+
   constructor() {
+    this.initialValues = new Map<string, any>([
+      ['String', ''],
+      ['Number', 0],
+      ['Date', new Date()],
+      ['Autocomplete', ''],
+      ['Table', []]
+    ]);
 
   }
 
   ngOnInit() {
+    if (this.data === undefined) {
+      this.data = [];
+    }
+    this.initializeData(this.data);
     this.dataSource = new MatTableDataSource<any>(this.data);
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
+  }
+
+  initializeData(data: object[]) { 
+    const props = this.tableInfo.displayedColumns;
+
+    for (const element of data) {
+      for (const prop of props) {
+        if (element[prop] === undefined) {
+          element[prop] = this.initialValues.get(this.tableInfo.columnTypes.get(prop).name);
+        }
+      }
+    }
   }
 
   onCellClick(event: Event, value: EditableValueComponent) {
@@ -57,10 +83,12 @@ export class DataTableComponent implements OnInit {
     const tableChange = new TableChange;
     tableChange.position = [];
     tableChange.value = {};
+    this.initializeData([tableChange.value]);
     tableChange.type = 'insert';
 
-    this.makeChanges(tableChange);
+    this.dataSource.data.unshift(tableChange.value);
     this.tableChange.emit(tableChange);
+    this.dataSource.data = this.dataSource.data;
   }
 
   delete() {
@@ -69,9 +97,14 @@ export class DataTableComponent implements OnInit {
     tableChange.position = [];
     tableChange.type = 'delete';
 
-    this.makeChanges(tableChange);
+    this.selection.selected.forEach((selected: object) => {
+      this.data.splice(this.dataSource.data.indexOf(selected), 1);
+    });
+
     this.tableChange.emit(tableChange);
     this.selection.clear();
+
+    this.dataSource.data = this.dataSource.data;
   }
 
   valueChanged = (element: object, column: string, change: any) => {
@@ -83,7 +116,7 @@ export class DataTableComponent implements OnInit {
       tableChange.type = 'update';
       tableChange.position = [{ row: element, column: column }];
       tableChange.value = change;
-      this.makeChanges(tableChange);
+      element[column] = change;
       this.tableChange.emit(tableChange);
     }
   }

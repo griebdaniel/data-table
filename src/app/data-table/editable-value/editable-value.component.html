@@ -2,47 +2,43 @@
   <ng-container *ngSwitchCase="'String'">
     <div *ngIf="open" [class.mat-elevation-z2]="true" class="input-container" (click)="onOpenClick($event)">
       <mat-form-field class="edit-input" (keyup.enter)="open = false">
-        <input appFocus matInput type="text" [(ngModel)]="value">
+        <input appFocus matInput type="text"  [formControl]="valueControl">
       </mat-form-field>
     </div>
-
-    <div *ngIf="!open">{{value}}</div>
+    <div *ngIf="!open">{{valueControl.value}}</div>
   </ng-container>
 
   <ng-container *ngSwitchCase="'Number'">
     <div *ngIf="open" [class.mat-elevation-z2]="true" class="input-container" (click)="onOpenClick($event)">
       <mat-form-field class="edit-input" (keyup.enter)="open = false">
-        <input appFocus matInput type="number" [(ngModel)]="value">
+        <input appFocus matInput type="number" [formControl]="valueControl">
       </mat-form-field>
     </div>
-
-    <div *ngIf="!open">{{value}}</div>
+    <div *ngIf="!open">{{valueControl.value}}</div>
   </ng-container>
 
   <ng-container *ngSwitchCase="'Table'">
     <div *ngIf="open" class="open-table" (click)="onTableClick($event, table)">
-      <lib-data-table #table [style.width]="'600px'" [data]="value" [tableInfo]="type.info"
-        (tableChange)="valueChanged.emit($event)"></lib-data-table>
+      <app-data-table #table [style.width]="'600px'" [data]="valueControl.value" [tableInfo]="type.info"
+        (tableChange)="valueChanged.emit($event)"></app-data-table>
     </div>
 
-    <span *ngIf="!open" class="text"> {{value?.length}} </span>
+    <span *ngIf="!open" class="text"> {{valueControl.value.length}} </span>
   </ng-container>
 
-
-
-
   <ng-container *ngSwitchCase="'AutocompleteMap'">
-    <form>
-      <mat-form-field *ngIf="open">
-        <input type="text" placeholder="Pick one" matInput [formControl]="valueControl" [matAutocomplete]="auto">
+    <div *ngIf="open" [class.mat-elevation-z2]="true" class="input-container" (click)="onOpenClick($event)">
+      <mat-form-field class="edit-input" *ngIf="open" (keyup.enter)="open = false">
+        <input appFocus matInput type="text" [formControl]="valueControl"
+          [matAutocomplete]="auto">
         <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+          <mat-option (click)="$event.stopPropagation()" *ngFor="let option of filteredOptions | async" [value]="option">
             {{option}}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
-    </form>
-    <span *ngIf="!open" class="text"> {{type.info['map'](valueControl.value)}} </span>
+    </div>
+    <span *ngIf="!open" class="text"> {{valueControl.value}} </span>
   </ng-container>
 
 

@@ -21,7 +21,7 @@
         <td (click)="onCellClick($event, editableValue)" mat-cell *matCellDef="let element; index as i">
           <div [style.position]="'relative'">
             <lib-editable-value #editableValue
-              [ngClass]="{'edit-active': editableValue.open}" [value]="element[column]"
+              [ngClass]="{'edit-active': editableValue.open}" [value]="element[column]  "
               [type]="tableInfo.columnTypes.get(column)" (valueChanged)="valueChanged(element, column, $event)">
             </lib-editable-value>
           </div>

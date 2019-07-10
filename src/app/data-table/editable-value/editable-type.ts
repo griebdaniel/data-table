@@ -1,11 +1,11 @@
 export class EditableType {
-  name: 'String' | 'Number' | 'Date' | 'AutocompleteMap' | 'Table';
+  name: 'Text' | 'Number' | 'Date' | 'AutocompleteMap' | 'Table';
   info?: AutocompleteMapInfo | TableInfo; 
 }
 
 export class AutocompleteMapInfo {
   map: (value: any) => any;
-  options: string[];
+  options: object[];
 }
 
 export class TableInfo {

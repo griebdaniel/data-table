@@ -1,5 +1,6 @@
 <div class="table-container">
-  <app-table-header (insert)="insert()" (delete)="delete()" (filter)="this.dataSource.filter = $event"></app-table-header>
+  <app-table-header (insert)="insert()" (delete)="delete()" (filter)="this.dataSource.filter = $event">
+  </app-table-header>
   <mat-divider></mat-divider>
   <table mat-table matSort [dataSource]="dataSource">
     <ng-container matColumnDef="select">
@@ -15,16 +16,15 @@
       </td>
     </ng-container>
 
-    <ng-container *ngFor="let column of tableInfo.displayedColumns">
+    <ng-container *ngFor="let column of tableInfo.displayedColumns; index as j">
       <ng-container matColumnDef={{column}}>
         <th mat-header-cell mat-sort-header *matHeaderCellDef> {{tableInfo.columnNames.get(column)}} </th>
-        <td (click)="onCellClick($event, editableValue)" mat-cell *matCellDef="let element; index as i">
-          <div [style.position]="'relative'">
-            <app-editable-value #editableValue
-              [ngClass]="{'edit-active': editableValue.open}" [value]="element[column]"
-              [type]="tableInfo.columnTypes.get(column)" (valueChanged)="valueChanged(element, column, $event)">
-            </app-editable-value>
-          </div>
+        <td #me (click)="me.isOpen = true" mat-cell *matCellDef="let element; index as i">
+          <app-editable-text #editableValue 
+            (onCancel)="editableValue.isOpen = !editableValue.isOpen"  
+            [isOpen]="me.isOpen" *ngIf="tableInfo.columnTypes.get(column).name === 'Text'" 
+            [ngClass]="{'edit-active': me.isOpen}" [value]="element[column]">
+          </app-editable-text>
         </td>
       </ng-container>
     </ng-container>

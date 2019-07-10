@@ -4,10 +4,16 @@ import { DataTableComponent } from '../data-table/data-table.component';
 import { FormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators'
-import * as Lodash from 'lodash';;
+import * as Lodash from 'lodash';
+
+export class ValueUpdate {
+  constructor(public fromValue: any, public toValue: any) {
+
+  }
+}
 
 @Component({
-  selector: 'lib-editable-value',
+  selector: 'app-editable-value',
   templateUrl: './editable-value.component.html',
   styleUrls: ['./editable-value.component.scss']
 })
@@ -20,7 +26,7 @@ export class EditableValueComponent implements OnInit {
 
   valueControl = new FormControl();
   filteredOptions: Observable<string[]>;
-  
+
   constructor() { }
 
   ngOnInit() {
@@ -33,12 +39,12 @@ export class EditableValueComponent implements OnInit {
     } else {
       this.valueControl.setValue(this.value);
     }
-    
+
     this.filteredOptions = this.valueControl.valueChanges
-    .pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    );
+      .pipe(
+        startWith(''),
+        map(value => this._filter(value))
+      );
   }
 
   private _filter(value: string): string[] {
@@ -52,10 +58,20 @@ export class EditableValueComponent implements OnInit {
   }
 
   set open(open: boolean) {
-    console.log(open);
-    if (this._open === true && open === false && this.type.name !== 'Table') {
-      this.valueChanged.emit(this.value);
+    if (this._open === true && open === false) {
+      switch (this.type.name) {
+        case 'AutocompleteMap':
+          const objectValue = Lodash.find(this.type.info['options'], (option) => this.type.info['map'](option) === this.valueControl.value);
+          this.valueChanged.emit(new ValueUpdate(this.value, objectValue));
+          break;
+        case 'Table':
+          break;
+        default:
+            this.valueChanged.emit(new ValueUpdate(this.value, this.valueControl.value));
+          break;
+      }
     }
+
     this._open = open;
   }
 

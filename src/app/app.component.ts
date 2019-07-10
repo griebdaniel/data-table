@@ -3,7 +3,8 @@ import * as Lodash from 'lodash';
 // import { TableInfo } from './table/table-info';
 // import { EditableType } from './table/editable-value/editable-type';
 
-import { EditableType, TableInfo } from 'data-table';
+import { EditableType, TableInfo } from './data-table/editable-value/editable-type';
+import { TableChange } from './data-table/data-table/data-table.component';
 
 @Component({
   selector: 'app-root',
@@ -13,52 +14,61 @@ import { EditableType, TableInfo } from 'data-table';
 export class AppComponent {
   data = [
     {
-      name: 'iron', quantity: 10, color: [
-        { name: 'blue', darkness: 0.1 },
-        { name: 'yellow', darkness: 0.5 }
-      ]
+      supply: { id: 1, name: 'wood' },
+      name: 'iron',
+      quantity: 10,
+      color: [
+        { name: 'blue', darkness: 0.1, supply: { name: 'yellow' } },
+        { name: 'yellow', darkness: 0.5, supply: { name: 'green' } }
+      ],
+
     },
     {
-      name: 'gold', quantity: 12, color: [
-        { name: 'red', darkness: 0.2 },
-        { name: 'green', darkness: 0.7 }
+      supply: { id: 2, name: 'glass' },
+      name: 'gold',
+      quantity: 12,
+      color: [
+        { name: 'red', darkness: 0.2, supply: { name: 'blue' } },
+        { name: 'green', darkness: 0.7, supply: { name: 'red' } },
       ]
     },
-    // { name: 'solver', quantity: 51 },
-    // { name: 'bronze', quantity: 2 },
-    // { name: 'wood', quantity: 4 },
-    // { name: 'copper', quantity: 17 },
-    // { name: 'leather', quantity: 35 },
-    // { name: 'platinum', quantity: 78 },
-    // { name: 'plastic', quantity: 34 },
-    // { name: 'glass', quantity: 1 },
   ];
   tableInfo = new TableInfo();
 
   constructor() {
     const colorTableInfo = new TableInfo();
-    colorTableInfo.displayedColumns = ['name', 'darkness'];
+    colorTableInfo.displayedColumns = ['supply', 'name', 'darkness'];
     colorTableInfo.columnNames = new Map([
       ['name', 'Name'],
-      ['darkness', 'Darkness']
+      ['darkness', 'Darkness'],
+      ['supply', 'Supply'],
     ]);
     colorTableInfo.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'String' }],
-      ['darkness', { name: 'Number' }]
+      ['name', { name: 'Text' }],
+      ['darkness', { name: 'Number' }],
+      ['supply', {
+        name: 'AutocompleteMap', info: {
+          map: (value) => value.name, options: [{ name: 'red' }, { name: 'yellow' }, { name: 'green' }, { name: 'blue' }],
+        }
+      }]
     ]);
 
-    this.tableInfo.displayedColumns = ['name', 'quantity', 'color'];
+    this.tableInfo.displayedColumns = ['color', 'name', 'quantity'];
     this.tableInfo.columnNames = new Map([
       ['name', 'Name'],
       ['quantity', 'Quantity'],
-      ['color', 'Color']
+      ['color', 'Color'],
     ]);
     this.tableInfo.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'String' }],
+      ['name', { name: 'Text' }],
       ['quantity', { name: 'Number' }],
-      ['color', { name: 'Table', info: colorTableInfo }]
+      ['color', {
+        name: 'Table', info: colorTableInfo,
+      }]
     ]);
+  }
 
-
+  onTableChange(tableChange: TableChange) {
+    console.log(tableChange);
   }
 }
