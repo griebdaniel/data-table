@@ -1,1 +1,2 @@
-<app-data-table [data]="data" [tableInfo]="tableInfo" (tableChange)="onTableChange($event)"></app-data-table>￼
+<app-data-table [data]="data" [tableInfo]="productOrderTI"
+[saveConfirmation]="saveConfirmation"  (update)="onUpdate($event)" (delete)="onDelete($event)" (insert)="onInsert($event)"></app-data-table>￼

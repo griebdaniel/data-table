@@ -1,14 +1,35 @@
-import { Component, OnInit, Input, ViewChildren, QueryList, ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
-import { EditableValueComponent, ValueUpdate } from '../editable-value/editable-value.component';
-import { TableInfo } from '../editable-value/editable-type';
-import { MatTableDataSource, MatTable, MatSort, MatPaginator } from '@angular/material';
+import { Component, OnInit, Input, ViewChildren, QueryList, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, ComponentRef } from '@angular/core';
+import { EditableValueComponent } from '../editable-value/editable-value.component';
+import { TableInfo, TableModification } from '../editable-value/editable-type';
+import { MatTableDataSource, MatTable, MatSort, MatPaginator, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as Lodash from 'lodash';
+import { TableInsertComponent } from '../table-insert/table-insert.component';
 import { Observable } from 'rxjs';
+
 
 export class TableChange {
   type: 'insert' | 'delete' | 'update';
   position: { row: object, column: string }[];
+  value: any;
+}
+
+export class TableFeatures {
+  sort?: boolean;
+  filter?: boolean;
+  edit?: boolean;
+  select?: boolean;
+  insert?: boolean;
+  delete?: boolean;
+  close?: boolean;
+  save?: boolean;
+  header?: boolean;
+  pagination?: boolean;
+}
+
+export class TableUpdate {
+  row: object;
+  column: string;
   value: any;
 }
 
@@ -18,144 +39,99 @@ export class TableChange {
   styleUrls: ['./data-table.component.scss']
 })
 export class DataTableComponent implements OnInit {
+  @ViewChildren('editableValue') editableValues: QueryList<any>;
   @ViewChild(MatTable, { static: true }) table: MatTable<any>;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
 
-  @Input() data: object[];
   @Input() tableInfo: TableInfo;
+  @Input() saveConfirmation: Observable<boolean>;
 
-  @ViewChildren(EditableValueComponent) editableValues: QueryList<EditableValueComponent>;
-  @Output() tableChange = new EventEmitter<TableChange>();
+  @Output() insert = new EventEmitter<object>();
+  @Output() delete = new EventEmitter<object[]>();
+  @Output() update = new EventEmitter<TableUpdate>();
 
-  @ViewChildren('editableValue') editableValues2: QueryList<any>;;
+  @Output() close = new EventEmitter<void>();
+  @Output() save = new EventEmitter<object[]>();
 
-
-  dataSource: MatTableDataSource<any>;
+  defaultFeatures: TableFeatures;
+  dataSource = new MatTableDataSource<any>();
   selection = new SelectionModel<any>(true, []);
 
+  proposedModification: TableModification;
 
-  initialValues: Map<string, any>;
+  constructor(public dialog: MatDialog) {
+    this.defaultFeatures = {
+      sort: true,
+      filter: true,
+      pagination: true,
+      edit: true,
+      select: true,
+      insert: true,
+      delete: true,
+      close: false,
+      save: false,
+      header: true,
+    };
+  }
 
-  constructor() {
-    this.initialValues = new Map<string, any>([
-      ['String', ''],
-      ['Number', 0],
-      ['Date', new Date()],
-      ['Autocomplete', ''],
-      ['Table', []]
-    ]);
+  @Input() set data(data: object[] | Promise<object[]>) {
+    data = Promise.resolve(data);
+    data.then(data2 => this.dataSource.data = data2 === undefined ? [] : Lodash.cloneDeep(data2));
+  }
 
+  get data() {
+    return this.dataSource.data;
   }
 
   ngOnInit() {
-    if (this.data === undefined) {
-      this.dataSource = new MatTableDataSource<any>([]);
-    } else {
-      this.dataSource = new MatTableDataSource<any>(this.data);
-    }
-
     this.dataSource.sort = this.sort;
     this.dataSource.paginator = this.paginator;
-    this.initializeData(this.dataSource.data);
+    this.tableInfo.features = Object.assign({}, this.defaultFeatures, this.tableInfo.features);
   }
 
-  initializeData(data: object[]) {
-    const props = this.tableInfo.displayedColumns;
-
-    for (const element of data) {
-      for (const prop of props) {
-        if (element[prop] === undefined) {
-          element[prop] = this.initialValues.get(this.tableInfo.columnTypes.get(prop).name);
-        }
-      }
+  onCellClick(editableValue: EditableValueComponent) {
+    if (this.openedEditableValue === undefined) {
+      editableValue.open = true;
     }
   }
 
-  onCellClick(value: any) {
-    console.log(value);
+  onUpdate(row: object, column: string, value: any) {
+    const modification = { row: Lodash.cloneDeep(row), column: column, value: value };
+    row[column] = value;
+    this.update.emit(modification);
+  }
+ 
+  onInsert() {
+    const dialogRef = this.dialog.open(TableInsertComponent, {
+      width: '320px',
+      data: this.tableInfo,
+      autoFocus: false,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result !== undefined) {
+        this.dataSource.data.unshift(result);
+        this.insert.emit(result);
+      }
+      this.dataSource.data = this.dataSource.data;
+    });
   }
 
-  insert() {
-    const tableChange = new TableChange;
-    tableChange.position = [];
-    tableChange.value = {};
-    this.initializeData([tableChange.value]);
-    tableChange.type = 'insert';
-
-    this.dataSource.data.unshift(tableChange.value);
-    this.tableChange.emit(tableChange);
-    this.dataSource.data = this.dataSource.data;
-  }
-
-  delete() {
-    const tableChange = new TableChange();
-    tableChange.value = this.selection.selected;
-    tableChange.position = [];
-    tableChange.type = 'delete';
-
+  onDelete() {
     this.selection.selected.forEach((selected: object) => {
       this.dataSource.data.splice(this.dataSource.data.indexOf(selected), 1);
     });
 
-    this.tableChange.emit(tableChange);
+    this.delete.emit(this.selection.selected);
+
     this.selection.clear();
-
     this.dataSource.data = this.dataSource.data;
   }
 
-  valueChanged = (element: object, column: string, change: any) => {
-    if (change instanceof TableChange) {
-      console.log('tablechange');
-      change.position.unshift({ row: element, column: column });
-      this.tableChange.emit(change);
-    } else if (change instanceof ValueUpdate) {
-      const tableChange = new TableChange();
-      tableChange.type = 'update';
-      tableChange.position = [{ row: element, column: column }];
-      tableChange.value = change;
-
-      element[column] = change.toValue;
-      this.tableChange.emit(tableChange);
-    }
-  }
-
-  makeChanges(tableChange: TableChange) {
-    let data = this.dataSource.data;
-
-    tableChange.position.forEach((position, index) => {
-      const i = data.indexOf(position.row);
-      const row = data[i];
-      if (tableChange.type === 'update' && index === tableChange.position.length - 1) {
-        data = row;
-      } else {
-        data = row[position.column];
-      }
-    });
-
-    switch (tableChange.type) {
-      case 'insert':
-        if (data.indexOf(tableChange.value) === -1) {
-          data.push(tableChange.value);
-        }
-        break;
-      case 'delete':
-        tableChange.value.forEach((selected: object) => {
-          const index = data.indexOf(selected);
-          if (index > -1) {
-            this.dataSource.data.splice(index, 1);
-          }
-        });
-        break;
-      case 'update':
-        data[tableChange.position[tableChange.position.length - 1].column] = tableChange.value;
-        break;
-
-      default:
-        break;
-    }
-
-    this.dataSource.data = this.dataSource.data;
+  onModification(row: object, column: string, value: any) {
+    row[column] = Lodash.cloneDeep(this.openedEditableValue.value);
+    this.update.emit({ row: row, column: column, value: value });
   }
 
   isAllSelected() {
@@ -172,11 +148,23 @@ export class DataTableComponent implements OnInit {
 
   get columnsWithSelect() {
     const data = Lodash.clone(this.tableInfo.displayedColumns);
-    data.unshift('select');
+    if (this.tableInfo.features.select) {
+      data.unshift('select');
+    }
     return data;
   }
 
+  get openedEditableValue(): any {
+    let editableValue2: any;
 
+    this.editableValues.forEach(editableValue => {
+      if (editableValue.open === true) {
+        editableValue2 = editableValue;
+      }
+    });
+
+    return editableValue2;
+  }
 
 }
 

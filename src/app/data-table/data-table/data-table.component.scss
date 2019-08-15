@@ -10,9 +10,9 @@ table {
 
 .edit-active {
   position: absolute;
-  // top: -24px;
-  // left: -24px;
-  z-index: 1;
+  top: -24px;
+  left: -24px;
+  z-index: 10;
 }
 
 .table-container {
@@ -20,8 +20,4 @@ table {
   width: inherit;
   background-color: inherit;
   @include mat-elevation(2);
-}
-
-.editable-value-container {
-  position: relative;
 }

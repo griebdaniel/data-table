@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 // import { TableComponent } from './table/table/table.component';
 
 import { DataTableModule } from './data-table/data-table.module'
+import { TableInsertComponent } from './data-table/table-insert/table-insert.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { DataTableModule } from './data-table/data-table.module'
     DataTableModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [TableInsertComponent]
 })
 export class AppModule { }

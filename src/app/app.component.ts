@@ -3,8 +3,9 @@ import * as Lodash from 'lodash';
 // import { TableInfo } from './table/table-info';
 // import { EditableType } from './table/editable-value/editable-type';
 
-import { EditableType, TableInfo } from './data-table/editable-value/editable-type';
-import { TableChange } from './data-table/data-table/data-table.component';
+import { EditableType, TableInfo, EditableTypeInfo } from './data-table/editable-value/editable-type';
+import { TableChange, TableUpdate } from './data-table/data-table/data-table.component';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,63 +13,57 @@ import { TableChange } from './data-table/data-table/data-table.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  saveConfirmation = new Subject<boolean>();
   data = [
     {
-      supply: { id: 1, name: 'wood' },
-      name: 'iron',
-      quantity: 10,
-      color: [
-        { name: 'blue', darkness: 0.1, supply: { name: 'yellow' } },
-        { name: 'yellow', darkness: 0.5, supply: { name: 'green' } }
-      ],
-
-    },
-    {
-      supply: { id: 2, name: 'glass' },
-      name: 'gold',
-      quantity: 12,
-      color: [
-        { name: 'red', darkness: 0.2, supply: { name: 'blue' } },
-        { name: 'green', darkness: 0.7, supply: { name: 'red' } },
+      name: 'Order1',
+      date: new Date(),
+      supplies: [
+        { name: { name: 'supply1' }, quantity: 1 },
       ]
-    },
+    }
   ];
-  tableInfo = new TableInfo();
+
+  productOrderTI = new TableInfo();
 
   constructor() {
-    const colorTableInfo = new TableInfo();
-    colorTableInfo.displayedColumns = ['supply', 'name', 'darkness'];
-    colorTableInfo.columnNames = new Map([
-      ['name', 'Name'],
-      ['darkness', 'Darkness'],
-      ['supply', 'Supply'],
-    ]);
-    colorTableInfo.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'Text' }],
-      ['darkness', { name: 'Number' }],
-      ['supply', {
-        name: 'AutocompleteMap', info: {
-          map: (value) => value.name, options: [{ name: 'red' }, { name: 'yellow' }, { name: 'green' }, { name: 'blue' }],
-        }
-      }]
-    ]);
+    const suppliesTI = new TableInfo();
 
-    this.tableInfo.displayedColumns = ['color', 'name', 'quantity'];
-    this.tableInfo.columnNames = new Map([
+    suppliesTI.displayedColumns = ['name', 'quantity'];
+    suppliesTI.columnNames = new Map([
       ['name', 'Name'],
       ['quantity', 'Quantity'],
-      ['color', 'Color'],
     ]);
-    this.tableInfo.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'Text' }],
+    suppliesTI.columnTypes = new Map<string, EditableType>([
+      ['name', { name: 'AutocompleteMap', info: { map: (value) => value.name, options: [{ name: 'supply1' }, { name: 'supply2' }] } }],
       ['quantity', { name: 'Number' }],
-      ['color', {
-        name: 'Table', info: colorTableInfo,
-      }]
     ]);
+
+    this.productOrderTI.displayedColumns = ['name', 'date', 'supplies'];
+    this.productOrderTI.columnNames = new Map([
+      ['name', 'Name'],
+      ['date', 'Date'],
+      ['supplies', 'Supplies'],
+    ]);
+    this.productOrderTI.columnTypes = new Map<string, EditableType>([
+      ['name', { name: 'Text' }],
+      ['date', { name: 'Date' }],
+      ['supplies', { name: 'Table', info: suppliesTI }],
+    ]);
+
+
   }
 
-  onTableChange(tableChange: TableChange) {
-    console.log(tableChange);
+  onUpdate(update: TableUpdate) {
+    console.log('updated', update);
+    this.saveConfirmation.next(true);
+  }
+
+  onInsert(row: object) {
+    console.log('insert', row);
+  }
+
+  onDelete(rows: object[]) {
+    console.log('delete', rows);
   }
 }
