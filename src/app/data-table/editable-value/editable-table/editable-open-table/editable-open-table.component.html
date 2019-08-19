@@ -1,0 +1,6 @@
+<div class="dialog-container">
+  <div mat-dialog-content class="container">
+    <app-data-table #table [data]="data.data" [tableInfo]="data.tableInfo" (save)="onSave()" (cancel)="onCancel()">
+    </app-data-table>
+  </div>
+</div>

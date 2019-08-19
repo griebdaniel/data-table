@@ -40,7 +40,7 @@ export class EditableValueComponent implements OnInit, EditableValue {
   }
 
   get open() {
-    if (this.editableValue === undefined) {
+    if (this.editableValue === undefined || this.editableValue.open === undefined) {
       return false;
     }
     return this.editableValue.open;

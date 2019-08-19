@@ -26,10 +26,9 @@
           {{tableInfo.columnNames.get(column)}} </th>
         <td (click)="onCellClick(editableValue)" mat-cell *matCellDef="let element; index as i">
           <div [style.position]="'relative'">
-            <app-editable-value #editableValue [value]="element[column]"
+            <app-editable-value #editableValue [value]="element[column]" class="editable-value"
               [typeName]="tableInfo.columnTypes.get(column).name" [typeInfo]="tableInfo.columnTypes.get(column).info"
-              [ngClass]="{'edit-active': editableValue.open}" (save)="onUpdate(element, column, $event)" 
-              (modified)="onModification(element, column, $event)" [saveConfirmation]="saveConfirmation">
+              [ngClass]="{'edit-active': tableInfo.columnTypes.get(column).name !== 'Table' && editableValue.open}" (save)="onUpdate(element, column, $event)">
             </app-editable-value>
           </div>
         </td>
@@ -39,5 +38,6 @@
     <tr mat-header-row *matHeaderRowDef="columnsWithSelect"></tr>
     <tr mat-row *matRowDef="let row; columns: columnsWithSelect;"></tr>
   </table>
-  <mat-paginator *ngIf="tableInfo.features.pagination" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons></mat-paginator>
+  <mat-paginator *ngIf="tableInfo.features.pagination" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons>
+  </mat-paginator>
 </div>

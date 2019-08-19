@@ -42,7 +42,7 @@ export class DataTableComponent implements OnInit {
   @ViewChildren('editableValue') editableValues: QueryList<any>;
   @ViewChild(MatTable, { static: true }) table: MatTable<any>;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
   @Input() tableInfo: TableInfo;
   @Input() saveConfirmation: Observable<boolean>;
@@ -86,7 +86,7 @@ export class DataTableComponent implements OnInit {
 
   ngOnInit() {
     this.dataSource.sort = this.sort;
-    this.dataSource.paginator = this.paginator;
+    setTimeout(() => this.dataSource.paginator = this.paginator, 0);
     this.tableInfo.features = Object.assign({}, this.defaultFeatures, this.tableInfo.features);
   }
 

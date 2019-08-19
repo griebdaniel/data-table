@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 
 import { DataTableModule } from './data-table/data-table.module'
 import { TableInsertComponent } from './data-table/table-insert/table-insert.component';
+import { EditableOpenTableComponent } from './data-table/editable-value/editable-table/editable-open-table/editable-open-table.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,6 @@ import { TableInsertComponent } from './data-table/table-insert/table-insert.com
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [TableInsertComponent]
+  entryComponents: [TableInsertComponent, EditableOpenTableComponent]
 })
 export class AppModule { }
