@@ -13,7 +13,7 @@
       <div (click)="openEditableValue(editableValue)" class="value-container">
         <app-editable-value #editableValue
           [ngClass]="{'edit-active': editableValue.open, 'edit-inactive': !editableValue.open}"
-          [typeName]="tableInfo.columnTypes.get(column).name" [typeInfo]="tableInfo.columnTypes.get(column).info" 
+          [type]="tableInfo.columnTypes.get(column).name" [typeInfo]="tableInfo.columnTypes.get(column).info" 
           (save)="value[column]=$event">
         </app-editable-value>
       </div>

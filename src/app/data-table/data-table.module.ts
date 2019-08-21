@@ -20,13 +20,15 @@ import { EditableTableComponent } from './editable-value/editable-table/editable
 import { CloseAutocompleteDirective } from './editable-value/close-autocomplete.directive';
 import { TableInsertComponent } from './table-insert/table-insert.component';
 import { EditableOpenTableComponent } from './editable-value/editable-table/editable-open-table/editable-open-table.component';
+import { EditableObjectComponent } from './editable-value/editable-object/editable-object.component';
+import { EditableOpenObjectComponent } from './editable-value/editable-object/editable-open-object/editable-open-object.component';
 
 
 @NgModule({
   declarations: [
     DataTableComponent, EditableValueComponent, TableHeaderComponent,
     FocusDirective, EditableTextComponent, EditableNumberComponent,
-    EditableDateComponent, EditableAutocompleteMapComponent, EditableTableComponent, CloseAutocompleteDirective, TableInsertComponent, EditableOpenTableComponent
+    EditableDateComponent, EditableAutocompleteMapComponent, EditableTableComponent, CloseAutocompleteDirective, TableInsertComponent, EditableOpenTableComponent, EditableObjectComponent, EditableOpenObjectComponent
   ],
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,

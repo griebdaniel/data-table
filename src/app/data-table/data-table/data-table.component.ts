@@ -1,17 +1,26 @@
 import { Component, OnInit, Input, ViewChildren, QueryList, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, ComponentRef } from '@angular/core';
 import { EditableValueComponent } from '../editable-value/editable-value.component';
-import { TableInfo, TableModification } from '../editable-value/editable-type';
+import { TableInfo } from '../editable-value/editable-type';
 import { MatTableDataSource, MatTable, MatSort, MatPaginator, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as Lodash from 'lodash';
 import { TableInsertComponent } from '../table-insert/table-insert.component';
-import { Observable } from 'rxjs';
+import { EditableOpenObjectComponent } from '../editable-value/editable-object/editable-open-object/editable-open-object.component';
 
+export class TableModification {
+  constructor(public value: any, public modification: TableInsert | TableDelete | TableUpdate) { }
+}
 
-export class TableChange {
-  type: 'insert' | 'delete' | 'update';
-  position: { row: object, column: string }[];
-  value: any;
+export class TableInsert {
+  constructor(public rows: object | object[]) { }
+}
+
+export class TableDelete {
+  constructor(public rows: object | object[]) { }
+}
+
+export class TableUpdate {
+  constructor(public row: object, public column: string, public value: any) { }
 }
 
 export class TableFeatures {
@@ -27,12 +36,6 @@ export class TableFeatures {
   pagination?: boolean;
 }
 
-export class TableUpdate {
-  row: object;
-  column: string;
-  value: any;
-}
-
 @Component({
   selector: 'app-data-table',
   templateUrl: './data-table.component.html',
@@ -45,20 +48,11 @@ export class DataTableComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
   @Input() tableInfo: TableInfo;
-  @Input() saveConfirmation: Observable<boolean>;
-
-  @Output() insert = new EventEmitter<object>();
-  @Output() delete = new EventEmitter<object[]>();
-  @Output() update = new EventEmitter<TableUpdate>();
-
-  @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<object[]>();
+  @Output() modified = new EventEmitter<TableModification>();
 
   defaultFeatures: TableFeatures;
   dataSource = new MatTableDataSource<any>();
   selection = new SelectionModel<any>(true, []);
-
-  proposedModification: TableModification;
 
   constructor(public dialog: MatDialog) {
     this.defaultFeatures = {
@@ -97,22 +91,22 @@ export class DataTableComponent implements OnInit {
   }
 
   onUpdate(row: object, column: string, value: any) {
-    const modification = { row: Lodash.cloneDeep(row), column: column, value: value };
+    const update = new TableUpdate(Lodash.clone(row), column, value);
     row[column] = value;
-    this.update.emit(modification);
+    this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), update));
   }
- 
+
   onInsert() {
-    const dialogRef = this.dialog.open(TableInsertComponent, {
+    const dialogRef = this.dialog.open(EditableOpenObjectComponent, {
       width: '320px',
-      data: this.tableInfo,
+      data: { value: {}, typeInfo: this.tableInfo, title: 'Insert' },
       autoFocus: false,
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         this.dataSource.data.unshift(result);
-        this.insert.emit(result);
+        this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableInsert(result)));
       }
       this.dataSource.data = this.dataSource.data;
     });
@@ -123,15 +117,15 @@ export class DataTableComponent implements OnInit {
       this.dataSource.data.splice(this.dataSource.data.indexOf(selected), 1);
     });
 
-    this.delete.emit(this.selection.selected);
+    this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableDelete(this.selection.selected)));
 
     this.selection.clear();
     this.dataSource.data = this.dataSource.data;
   }
 
-  onModification(row: object, column: string, value: any) {
-    row[column] = Lodash.cloneDeep(this.openedEditableValue.value);
-    this.update.emit({ row: row, column: column, value: value });
+  onModification(row: object, column: string, modification: TableModification) {
+    row[column] = modification.value;
+    this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableUpdate(row, column, modification)));
   }
 
   isAllSelected() {

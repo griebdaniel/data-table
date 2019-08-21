@@ -1,6 +1,6 @@
 import { TableFeatures } from '../data-table/data-table.component';
 
-export type EditableTypeName = 'Text' | 'Number' | 'Date' | 'AutocompleteMap' | 'Table';
+export type EditableTypeName = 'Text' | 'Number' | 'Date' | 'AutocompleteMap' | 'Table' | 'Object';
 export type EditableTypeInfo = AutocompleteMapInfo | TableInfo;
 
 export type EditableType = {
@@ -20,8 +20,8 @@ export class TableInfo {
   features?: TableFeatures;
 }
 
-export class TableModification {
-  type: 'insert' | 'delete' | 'update';
-  value: any;
-}
+// export class TableModification {
+//   type: 'insert' | 'delete' | 'update';
+//   value: any;
+// }
 

@@ -11,9 +11,8 @@ import { Observable } from 'rxjs';
   styleUrls: ['./editable-value.component.scss']
 })
 export class EditableValueComponent implements OnInit, EditableValue {
+  @Input() type: EditableTypeName;
   @Input() typeInfo: EditableTypeInfo;
-  @Input() typeName: EditableTypeName;
-  @Input() saveConfirmation: Observable<boolean>;
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
   @Output() modified = new EventEmitter<any>();
@@ -28,11 +27,13 @@ export class EditableValueComponent implements OnInit, EditableValue {
 
   onSave(value: any) {
     this.save.emit(value);
+    this.editableValue.open = false;
   }
 
   onCancel() {
     this.cancel.emit();
-    this.editableValue.value = this.value;
+    this.editableValue.value = this._value;
+    this.editableValue.open = false;
   }
 
   onModification(modification: any) {
@@ -58,6 +59,6 @@ export class EditableValueComponent implements OnInit, EditableValue {
   };
 
   get value() {
-    return this._value;
+    return this.editableValue.value;
   }
 }

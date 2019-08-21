@@ -7,6 +7,7 @@ class Features {
   delete?: boolean;
   filter?: boolean;
   close?: boolean;
+  save?: boolean;
 }
 
 @Component({

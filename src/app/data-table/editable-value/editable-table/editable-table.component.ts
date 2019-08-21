@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import EditableValue from '../editable-value';
-import { TableInfo, TableModification } from '../editable-type';
-import { Observable } from 'rxjs';
+import { TableInfo } from '../editable-type';
+import { Observable, Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { EditableOpenTableComponent } from './editable-open-table/editable-open-table.component';
 import * as Lodash from 'lodash';
@@ -14,20 +14,21 @@ import * as Lodash from 'lodash';
 export class EditableTableComponent implements OnInit, EditableValue {
   @Input() typeInfo: TableInfo;
   @Input() value: object[];
-  @Input() saveConfirmation: Observable<boolean>;
-  @Output() save = new EventEmitter<any>();
+
+  @Output() save = new EventEmitter<object[]>();
   @Output() cancel = new EventEmitter<void>();
-  @Output() modified = new EventEmitter<TableModification>();
+  @Output() modified = new EventEmitter<any>();
 
   _open: boolean;
-
+  tableModified = new Subject<any>();
   dialogRef: MatDialogRef<any>;
 
   constructor(public dialog: MatDialog) {}
 
   ngOnInit() {
-    console.log(this.value);
-    this.typeInfo.features = Object.assign({}, this.typeInfo.features, { close: true, save: true });
+    this.tableModified.subscribe((modification) => {
+      this.modified.emit(modification);
+    });
   }
 
   set open(open: boolean) {
@@ -36,9 +37,10 @@ export class EditableTableComponent implements OnInit, EditableValue {
     if (open === true) {
       this.dialogRef = this.dialog.open(EditableOpenTableComponent, {
         panelClass: 'custom-dialog-container',
-        width: '720px',
-        data: { data: this.value, tableInfo: this.typeInfo },
+        width: '100vw',
+        data: { data: this.value, tableInfo: this.typeInfo, modified: this.tableModified },
         autoFocus: false,
+        disableClose: true
       });
 
       this.dialogRef.afterClosed().subscribe(result => {

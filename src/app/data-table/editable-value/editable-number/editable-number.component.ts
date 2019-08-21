@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, AfterViewInit, ElementRef, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 @Component({
@@ -8,7 +8,7 @@ import { FormControl } from '@angular/forms';
 })
 export class EditableNumberComponent implements OnInit {
   @Output() save = new EventEmitter<string>();
-  @Output() cancel = new EventEmitter();
+  @Output() cancel = new EventEmitter<void>();
 
   open = false;
   valueControl = new FormControl();

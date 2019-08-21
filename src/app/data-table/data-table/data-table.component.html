@@ -27,8 +27,9 @@
         <td (click)="onCellClick(editableValue)" mat-cell *matCellDef="let element; index as i">
           <div [style.position]="'relative'">
             <app-editable-value #editableValue [value]="element[column]" class="editable-value"
-              [typeName]="tableInfo.columnTypes.get(column).name" [typeInfo]="tableInfo.columnTypes.get(column).info"
-              [ngClass]="{'edit-active': tableInfo.columnTypes.get(column).name !== 'Table' && editableValue.open}" (save)="onUpdate(element, column, $event)">
+              [type]="tableInfo.columnTypes.get(column).name" [typeInfo]="tableInfo.columnTypes.get(column).info"
+              [ngClass]="{'edit-active': tableInfo.columnTypes.get(column).name !== 'Table' && tableInfo.columnTypes.get(column).name !== 'Object' && editableValue.open}" 
+              (save)="onUpdate(element, column, $event)" (modified)="onModification(element, column, $event)"> 
             </app-editable-value>
           </div>
         </td>
