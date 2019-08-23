@@ -1,11 +1,11 @@
 import { EventEmitter } from '@angular/core';
-import { EditableTypeInfo } from './editable-type';
+import { TextInfo, TableInfo } from './editable-type';
 
 export default interface EditableValue {
   value: string | number | Date | object | object[];
-  typeInfo: EditableTypeInfo;
+  typeInfo: TableInfo | TextInfo;
   save: EventEmitter<any>;
-  cancel: EventEmitter<void>;
+  cancel: EventEmitter<any>;
   modified?: EventEmitter<any>;
   open: boolean;
 }

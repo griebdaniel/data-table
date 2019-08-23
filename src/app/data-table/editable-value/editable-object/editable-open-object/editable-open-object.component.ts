@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject, Input, ViewChildren, QueryList } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { TableInfo } from '../../editable-type';
+import { ColumnInfo } from '../../editable-type';
 import EditableValue from '../../editable-value';
 import * as Lodash from 'lodash';
 
@@ -16,7 +16,7 @@ export class EditableOpenObjectComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<EditableOpenObjectComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { value: object, typeInfo: TableInfo, title: string }
+    @Inject(MAT_DIALOG_DATA) public data: { value: object, typeInfo: ColumnInfo, title: string }
   ) {
 
   }

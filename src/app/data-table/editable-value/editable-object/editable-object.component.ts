@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import EditableValue from '../editable-value';
-import { TableInfo } from '../editable-type';
+import { ColumnInfo } from '../editable-type';
 import { Observable, Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
@@ -13,7 +13,7 @@ import { EditableOpenObjectComponent } from './editable-open-object/editable-ope
   styleUrls: ['./editable-object.component.scss']
 })
 export class EditableObjectComponent implements OnInit {
-  @Input() typeInfo: TableInfo;
+  @Input() typeInfo: ColumnInfo;
   @Input() value: object;
   @Output() save = new EventEmitter<object[]>();
   @Output() cancel = new EventEmitter<void>();

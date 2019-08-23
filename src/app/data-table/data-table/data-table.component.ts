@@ -1,10 +1,9 @@
 import { Component, OnInit, Input, ViewChildren, QueryList, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, ComponentRef } from '@angular/core';
 import { EditableValueComponent } from '../editable-value/editable-value.component';
-import { TableInfo } from '../editable-value/editable-type';
+import { ColumnInfo, TableInfo } from '../editable-value/editable-type';
 import { MatTableDataSource, MatTable, MatSort, MatPaginator, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as Lodash from 'lodash';
-import { TableInsertComponent } from '../table-insert/table-insert.component';
 import { EditableOpenObjectComponent } from '../editable-value/editable-object/editable-open-object/editable-open-object.component';
 
 export class TableModification {
@@ -26,7 +25,7 @@ export class TableUpdate {
 export class TableFeatures {
   sort?: boolean;
   filter?: boolean;
-  edit?: boolean;
+  edit?: Array<string> | boolean;
   select?: boolean;
   insert?: boolean;
   delete?: boolean;
@@ -49,6 +48,8 @@ export class DataTableComponent implements OnInit {
 
   @Input() tableInfo: TableInfo;
   @Output() modified = new EventEmitter<TableModification>();
+  @Output() save = new EventEmitter<object[]>();
+  @Output() cancel = new EventEmitter<object[]>();
 
   defaultFeatures: TableFeatures;
   dataSource = new MatTableDataSource<any>();
@@ -84,8 +85,12 @@ export class DataTableComponent implements OnInit {
     this.tableInfo.features = Object.assign({}, this.defaultFeatures, this.tableInfo.features);
   }
 
-  onCellClick(editableValue: EditableValueComponent) {
-    if (this.openedEditableValue === undefined) {
+  onCellClick(editableValue: EditableValueComponent, column: string) {  
+    if (
+      this.openedEditableValue === undefined &&
+      this.tableInfo.features.edit !== false &&
+      (this.tableInfo.features.edit === true || (this.tableInfo.features.edit as any).indexOf(column) > -1)
+    ) {
       editableValue.open = true;
     }
   }
@@ -99,7 +104,7 @@ export class DataTableComponent implements OnInit {
   onInsert() {
     const dialogRef = this.dialog.open(EditableOpenObjectComponent, {
       width: '320px',
-      data: { value: {}, typeInfo: this.tableInfo, title: 'Insert' },
+      data: { value: {}, typeInfo: this.tableInfo.columnInfo, title: 'Insert' },
       autoFocus: false,
     });
 
@@ -128,6 +133,14 @@ export class DataTableComponent implements OnInit {
     this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableUpdate(row, column, modification)));
   }
 
+  onSave() {
+    this.save.emit(Lodash.cloneDeep(this.data) as any);
+  }
+
+  onCancel() {
+    this.cancel.emit(Lodash.cloneDeep(this.data) as any);
+  }
+
   isAllSelected() {
     const numSelected = this.selection.selected.length;
     const numRows = this.dataSource.data.length;
@@ -141,11 +154,11 @@ export class DataTableComponent implements OnInit {
   }
 
   get columnsWithSelect() {
-    const data = Lodash.clone(this.tableInfo.displayedColumns);
+    const columns = this.tableInfo.columnInfo.map(columnInfo => columnInfo.name);
     if (this.tableInfo.features.select) {
-      data.unshift('select');
+      columns.unshift('select');
     }
-    return data;
+    return columns;
   }
 
   get openedEditableValue(): any {

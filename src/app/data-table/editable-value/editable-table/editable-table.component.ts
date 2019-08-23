@@ -1,10 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import EditableValue from '../editable-value';
-import { TableInfo } from '../editable-type';
+import { ColumnInfo, TableInfo } from '../editable-type';
 import { Observable, Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { EditableOpenTableComponent } from './editable-open-table/editable-open-table.component';
 import * as Lodash from 'lodash';
+import { TableFeatures } from '../../data-table/data-table.component';
 
 @Component({
   selector: 'app-editable-table',
@@ -15,7 +16,7 @@ export class EditableTableComponent implements OnInit, EditableValue {
   @Input() typeInfo: TableInfo;
   @Input() value: object[];
 
-  @Output() save = new EventEmitter<object[]>();
+  @Output() save = new EventEmitter<object[]>(); 
   @Output() cancel = new EventEmitter<void>();
   @Output() modified = new EventEmitter<any>();
 
@@ -33,10 +34,11 @@ export class EditableTableComponent implements OnInit, EditableValue {
 
   set open(open: boolean) {
     this._open = open;
-
+    this.typeInfo.features =  { save: true, close: true };
+    
     if (open === true) {
       this.dialogRef = this.dialog.open(EditableOpenTableComponent, {
-        panelClass: 'custom-dialog-container',
+        panelClass: 'object-dialog-container',
         width: '100vw',
         data: { data: this.value, tableInfo: this.typeInfo, modified: this.tableModified },
         autoFocus: false,

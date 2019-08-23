@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChildren, QueryList, ViewChild } from '@angular/core';
-import { EditableType, EditableTypeInfo, EditableTypeName } from './editable-type';
+import { EditableType, TextInfo, ColumnInfo, TableInfo } from './editable-type';
 import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 import EditableValue from './editable-value';
 import { Observable } from 'rxjs';
@@ -11,8 +11,8 @@ import { Observable } from 'rxjs';
   styleUrls: ['./editable-value.component.scss']
 })
 export class EditableValueComponent implements OnInit, EditableValue {
-  @Input() type: EditableTypeName;
-  @Input() typeInfo: EditableTypeInfo;
+  @Input() type: EditableType;
+  @Input() typeInfo: TableInfo | TextInfo;
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
   @Output() modified = new EventEmitter<any>();
@@ -30,8 +30,9 @@ export class EditableValueComponent implements OnInit, EditableValue {
     this.editableValue.open = false;
   }
 
-  onCancel() {
-    this.cancel.emit();
+  onCancel(value: any) {
+    console.log('cancel emit')
+    this.cancel.emit(value);
     this.editableValue.value = this._value;
     this.editableValue.open = false;
   }

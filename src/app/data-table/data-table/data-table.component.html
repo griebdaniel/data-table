@@ -1,7 +1,7 @@
 <div class="table-container">
   <ng-container *ngIf="tableInfo.features.header">
     <app-table-header [features]="tableInfo.features" (insert)="onInsert()" (delete)="onDelete()"
-      (filter)="this.dataSource.filter = $event" (close)="close.emit()" (save)="save.emit(dataSource.data)">
+      (filter)="this.dataSource.filter = $event" (close)="onCancel()" (save)="onSave()">
     </app-table-header>
     <mat-divider></mat-divider>
   </ng-container>
@@ -20,16 +20,17 @@
       </td>
     </ng-container>
 
-    <ng-container *ngFor="let column of tableInfo.displayedColumns; index as j">
-      <ng-container matColumnDef={{column}}>
+    <ng-container *ngFor="let column of tableInfo.columnInfo; index as j">
+      <ng-container matColumnDef={{column.name}}>
         <th mat-header-cell mat-sort-header *matHeaderCellDef [disabled]="!tableInfo.features.sort">
-          {{tableInfo.columnNames.get(column)}} </th>
-        <td (click)="onCellClick(editableValue)" mat-cell *matCellDef="let element; index as i">
+          {{column.name}} </th>
+        <td (click)="onCellClick(editableValue, column.name)" mat-cell *matCellDef="let element; index as i">
           <div [style.position]="'relative'">
-            <app-editable-value #editableValue [value]="element[column]" class="editable-value"
-              [type]="tableInfo.columnTypes.get(column).name" [typeInfo]="tableInfo.columnTypes.get(column).info"
-              [ngClass]="{'edit-active': tableInfo.columnTypes.get(column).name !== 'Table' && tableInfo.columnTypes.get(column).name !== 'Object' && editableValue.open}" 
-              (save)="onUpdate(element, column, $event)" (modified)="onModification(element, column, $event)"> 
+            <app-editable-value #editableValue [value]="element[column.name]" class="editable-value"
+              [type]="column.type" [typeInfo]="column.info"
+              [ngClass]="{'edit-active': column.type !== 'Table' && column.type !== 'Object' && editableValue.open}"
+              (save)="onUpdate(element, column.name, $event)" (modified)="onModification(element, column.name, $event)"
+              (cancel)="element[column.name]=$event">
             </app-editable-value>
           </div>
         </td>

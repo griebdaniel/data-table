@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, Output, EventEmitter, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { TableInfo } from '../../editable-type';
-import { DataTableComponent } from 'src/app/data-table/data-table/data-table.component';
+import { ColumnInfo, TableInfo } from '../../editable-type';
+import { DataTableComponent, TableFeatures } from 'src/app/data-table/data-table/data-table.component';
 import { Subject } from 'rxjs';
 
 @Component({
@@ -16,10 +16,11 @@ export class EditableOpenTableComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { data: object[], tableInfo: TableInfo, modified: Subject<any> }) { }
 
   ngOnInit() {
-    this.dialogRef.backdropClick().subscribe(() => this.dialogRef.close(this.table.data));
+
   }
 
   onModification(modification: any) {
     this.data.modified.next(modification);
   }
+
 }

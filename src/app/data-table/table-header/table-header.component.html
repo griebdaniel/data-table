@@ -11,11 +11,11 @@
     </mat-form-field>
   </div>
   <div>
-    <button *ngIf="features.save" color="primary"  mat-icon-button (click)="$event.stopPropagation(); save.emit()">
-      <mat-icon >save</mat-icon>
+    <button *ngIf="features.save" color="primary" mat-icon-button (click)="$event.stopPropagation(); save.emit()">
+      <mat-icon>save</mat-icon>
     </button>
     <button *ngIf="features.close" color="primary" mat-icon-button (click)="$event.stopPropagation(); close.emit()">
-      <mat-icon >close</mat-icon>
+      <mat-icon>cancel</mat-icon>
     </button>
   </div>
 </div>

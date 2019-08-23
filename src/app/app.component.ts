@@ -3,7 +3,7 @@ import * as Lodash from 'lodash';
 // import { TableInfo } from './table/table-info';
 // import { EditableType } from './table/editable-value/editable-type';
 
-import { EditableType, TableInfo, EditableTypeInfo } from './data-table/editable-value/editable-type';
+import { EditableType, ColumnInfo, TableInfo} from './data-table/editable-value/editable-type';
 
 import { Subject } from 'rxjs';
 import { TableUpdate, TableDelete, TableInsert } from './data-table/data-table/data-table.component';
@@ -26,73 +26,34 @@ export class AppComponent {
     }
   ];
 
-  productOrderTI = new TableInfo();
+  productOrderInfo: TableInfo;
 
   constructor() {
-    const supplierInfo = [
+    const supplierInfo: ColumnInfo = [
       { name: 'name', type: 'Text' },
       { name: 'phone', type: 'Number' },
     ]
 
     const options = [
-      { name: 'supply1' },
-      { name: 'supply2' },
-    ]
+      { name: 'Supply1' },
+      { name: 'Supply2' },
+    ];
     const map = (value: any) => value.name;
     const remap = (originalValue: any, mappedValue: any) => options.find(option => map(option) === mappedValue);
 
-    const suppliesInfo = [
+    const suppliesInfo: ColumnInfo = [
       { name: 'name', type: 'Text', info: { map: map, remap: remap, options: options } },
       { name: 'quantity', type: 'Number' },
     ];
 
-    const productOrderInfo = [
+    const productOrderColumnInfo: ColumnInfo = [
       { name: 'name', type: 'Text' },
-      { name: 'data', type: 'Date' },
+      { name: 'date', type: 'Date' },
       { name: 'supplier', type: 'Object', info: supplierInfo },
-      { name: 'supplies', type: 'Table', info: suppliesInfo },
+      { name: 'supplies', type: 'Table', info: { columnInfo: suppliesInfo } },
     ];
 
-
-    const supplierTI = new TableInfo();
-    supplierTI.displayedColumns = ['name', 'phone'];
-    supplierTI.columnNames = new Map([
-      ['name', 'Name'],
-      ['phone', 'Phone'],
-    ]);
-    supplierTI.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'Text' }],
-      ['phone', { name: 'Number' }],
-    ]);
-
-    const suppliesTI = new TableInfo();
-    suppliesTI.displayedColumns = ['name', 'quantity'];
-    suppliesTI.columnNames = new Map([
-      ['name', 'Name'],
-      ['quantity', 'Quantity'],
-    ]);
-    suppliesTI.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'AutocompleteMap', info: { map: (value) => value.name, options: [{ name: 'supply1' }, { name: 'supply2' }] } }],
-      ['quantity', { name: 'Number' }],
-    ]);
-
-    this.productOrderTI.displayedColumns = ['name', 'date', 'supplies', 'supplier'];
-    this.productOrderTI.columnNames = new Map([
-      ['name', 'Name'],
-      ['date', 'Date'],
-      ['supplies', 'Supplies'],
-      ['supplier', 'Supplier']
-    ]);
-    this.productOrderTI.columnTypes = new Map<string, EditableType>([
-      ['name', { name: 'Text' }],
-      ['date', { name: 'Date' }],
-      ['supplies', { name: 'Table', info: suppliesTI }],
-      ['supplier', { name: 'Object', info: supplierTI }],
-    ]);
-
-
-
-
+    this.productOrderInfo  = { columnInfo: productOrderColumnInfo };
   }
 
   onModification(modification: any) {

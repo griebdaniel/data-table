@@ -1,27 +1,19 @@
 import { TableFeatures } from '../data-table/data-table.component';
 
-export type EditableTypeName = 'Text' | 'Number' | 'Date' | 'AutocompleteMap' | 'Table' | 'Object';
-export type EditableTypeInfo = AutocompleteMapInfo | TableInfo;
+export type EditableType = 'Text' | 'Number' | 'Date' | 'Object' | 'Table';
 
-export type EditableType = {
-  name: EditableTypeName,
-  info?: EditableTypeInfo,
-}
-
-export class AutocompleteMapInfo {
-  map: (value: any) => any;
-  options: object[];
+export class TextInfo {
+  options?: any[];
+  map?: (value: any) => string;
+  remap?: (originalValue: any, mappedValue: string) => any;
 }
 
 export class TableInfo {
-  displayedColumns: string[];
-  columnNames: Map<string, string>;
-  columnTypes: Map<string, EditableType>;
+  columnInfo?: ColumnInfo;
   features?: TableFeatures;
 }
 
-// export class TableModification {
-//   type: 'insert' | 'delete' | 'update';
-//   value: any;
-// }
+export type ObjectInfo = ColumnInfo;
+
+export type ColumnInfo = Array<{ name: string, type: EditableType, info?: TextInfo | ObjectInfo | TableInfo }>;
 

@@ -9,7 +9,6 @@ import { FormsModule } from '@angular/forms';
 // import { TableComponent } from './table/table/table.component';
 
 import { DataTableModule } from './data-table/data-table.module'
-import { TableInsertComponent } from './data-table/table-insert/table-insert.component';
 import { EditableOpenTableComponent } from './data-table/editable-value/editable-table/editable-open-table/editable-open-table.component';
 import { EditableOpenObjectComponent } from './data-table/editable-value/editable-object/editable-open-object/editable-open-object.component';
 
@@ -26,6 +25,6 @@ import { EditableOpenObjectComponent } from './data-table/editable-value/editabl
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [TableInsertComponent, EditableOpenTableComponent, EditableOpenObjectComponent]
+  entryComponents: [EditableOpenTableComponent, EditableOpenObjectComponent]
 })
 export class AppModule { }
