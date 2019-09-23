@@ -1,9 +1,9 @@
 import { EventEmitter } from '@angular/core';
-import { TextInfo, TableInfo } from './editable-type';
+import { TableOptions, TextOptions, ObjectOptions } from './editable-type';
 
 export default interface EditableValue {
   value: string | number | Date | object | object[];
-  typeInfo: TableInfo | TextInfo;
+  options: TableOptions | TextOptions | ObjectOptions;
   save: EventEmitter<any>;
   cancel: EventEmitter<any>;
   modified?: EventEmitter<any>;

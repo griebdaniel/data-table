@@ -4,15 +4,17 @@ import { TableOptions } from '../../editable-type';
 import { DataTableComponent } from 'src/app/data-table/data-table/data-table.component';
 import { Subject } from 'rxjs';
 
+
 @Component({
-  selector: 'app-editable-open-table',
-  templateUrl: './editable-open-table.component.html',
-  styleUrls: ['./editable-open-table.component.scss']
+  selector: 'app-editable-open-array',
+  templateUrl: './editable-open-array.component.html',
+  styleUrls: ['./editable-open-array.component.scss']
 })
-export class EditableOpenTableComponent implements OnInit {
+export class EditableOpenArrayComponent implements OnInit {
+
   @ViewChild('table', { static: false }) table: DataTableComponent;
 
-  constructor(public dialogRef: MatDialogRef<EditableOpenTableComponent>,
+  constructor(public dialogRef: MatDialogRef<EditableOpenArrayComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { data: object[], options: TableOptions, modified: Subject<any> }) { }
 
   ngOnInit() {
@@ -26,5 +28,4 @@ export class EditableOpenTableComponent implements OnInit {
   onModification(modification: any) {
     this.data.modified.next(modification);
   }
-
 }

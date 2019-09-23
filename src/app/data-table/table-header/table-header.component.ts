@@ -1,8 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
-import { TableFeatures } from '../data-table/data-table.component';
 
 
-class Features {
+class HeaderOptions {
   insert?: boolean;
   delete?: boolean;
   filter?: boolean;
@@ -16,14 +15,14 @@ class Features {
   styleUrls: ['./table-header.component.scss']
 })
 export class TableHeaderComponent implements OnInit {
-  @Input() features: Features;
+  @Input() options: HeaderOptions;
   @Output() insert = new EventEmitter();
   @Output() delete = new EventEmitter();
   @Output() filter = new EventEmitter();
   @Output() close = new EventEmitter();
   @Output() save = new EventEmitter();
 
-  defaultFeatures: TableFeatures = {
+  defaultOptions: HeaderOptions = {
     insert: true,
     delete: true,
     filter: true,
@@ -34,6 +33,6 @@ export class TableHeaderComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.features = Object.assign({}, this.defaultFeatures, this.features);
+    this.options = Object.assign({}, this.defaultOptions, this.options);
   }
 }

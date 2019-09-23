@@ -1,11 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import EditableValue from '../editable-value';
-import { ColumnInfo } from '../editable-type';
-import { Observable, Subject } from 'rxjs';
+import { ColumnType, ObjectOptions } from '../editable-type';
+import { Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import * as Lodash from 'lodash';
-import { EditableOpenObjectComponent } from './editable-open-object/editable-open-object.component';
+import { EditableOpenObjectComponent, ObjectModification } from './editable-open-object/editable-open-object.component';
+
 
 @Component({
   selector: 'app-editable-object',
@@ -13,18 +13,22 @@ import { EditableOpenObjectComponent } from './editable-open-object/editable-ope
   styleUrls: ['./editable-object.component.scss']
 })
 export class EditableObjectComponent implements OnInit {
-  @Input() typeInfo: ColumnInfo;
+  @Input() options: ObjectOptions;
   @Input() value: object;
   @Output() save = new EventEmitter<object[]>();
   @Output() cancel = new EventEmitter<void>();
+  @Output() modified = new EventEmitter<ObjectModification>();
 
+  objectModified = new Subject<any>();
   _open: boolean;
   dialogRef: MatDialogRef<any>;
 
   constructor(public dialog: MatDialog) {}
 
   ngOnInit() {
-
+    this.objectModified.subscribe(modification => {
+      this.modified.emit(modification);
+    })
   }
 
   set open(open: boolean) {
@@ -33,7 +37,7 @@ export class EditableObjectComponent implements OnInit {
     if (open === true) {
       this.dialogRef = this.dialog.open(EditableOpenObjectComponent, {
         width: '320px',
-        data: { value: this.value, typeInfo: this.typeInfo, title: 'Edit' },
+        data: { value: this.value, options: this.options, modified: this.objectModified, title: 'Edit' },
         autoFocus: false,
         disableClose: true
       });
@@ -42,6 +46,8 @@ export class EditableObjectComponent implements OnInit {
         this._open = false;
         if (result !== undefined) {
           this.save.emit(Lodash.cloneDeep(result));
+        } else {
+          this.cancel.emit();
         }
       });
     } else {

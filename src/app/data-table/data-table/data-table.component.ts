@@ -1,38 +1,23 @@
 import { Component, OnInit, Input, ViewChildren, QueryList, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, ComponentRef } from '@angular/core';
 import { EditableValueComponent } from '../editable-value/editable-value.component';
-import { ColumnInfo, TableInfo } from '../editable-value/editable-type';
+import { TableOptions, EditableType, ObjectOptions } from '../editable-value/editable-type';
 import { MatTableDataSource, MatTable, MatSort, MatPaginator, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as Lodash from 'lodash';
 import { EditableOpenObjectComponent } from '../editable-value/editable-object/editable-open-object/editable-open-object.component';
+import { empty } from 'rxjs';
 
-export class TableModification {
-  constructor(public value: any, public modification: TableInsert | TableDelete | TableUpdate) { }
-}
 
 export class TableInsert {
-  constructor(public rows: object | object[]) { }
+  constructor(public rows: object) { }
 }
 
 export class TableDelete {
-  constructor(public rows: object | object[]) { }
+  constructor(public rows: object[]) { }
 }
 
 export class TableUpdate {
   constructor(public row: object, public column: string, public value: any) { }
-}
-
-export class TableFeatures {
-  sort?: boolean;
-  filter?: boolean;
-  edit?: Array<string> | boolean;
-  select?: boolean;
-  insert?: boolean;
-  delete?: boolean;
-  close?: boolean;
-  save?: boolean;
-  header?: boolean;
-  pagination?: boolean;
 }
 
 @Component({
@@ -46,33 +31,87 @@ export class DataTableComponent implements OnInit {
   @ViewChild(MatSort, { static: true }) sort: MatSort;
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
-  @Input() tableInfo: TableInfo;
-  @Output() modified = new EventEmitter<TableModification>();
+  @Input() options: TableOptions;
+  @Output() modified = new EventEmitter<TableUpdate | TableInsert | TableDelete>();
   @Output() save = new EventEmitter<object[]>();
   @Output() cancel = new EventEmitter<object[]>();
 
-  defaultFeatures: TableFeatures;
-  dataSource = new MatTableDataSource<any>();
+  defaultOptions: TableOptions;
+  dataSource = new MatTableDataSource<any>([]);
   selection = new SelectionModel<any>(true, []);
 
   constructor(public dialog: MatDialog) {
-    this.defaultFeatures = {
-      sort: true,
+    this.defaultOptions = {
       filter: true,
       pagination: true,
-      edit: true,
+      editDisabled: false,
       select: true,
       insert: true,
       delete: true,
       close: false,
       save: false,
-      header: true,
     };
   }
 
   @Input() set data(data: object[] | Promise<object[]>) {
     data = Promise.resolve(data);
-    data.then(data2 => this.dataSource.data = data2 === undefined ? [] : Lodash.cloneDeep(data2));
+    data.then(data2 => {
+      this.dataSource.data = data2 === undefined ? [] : data2;
+
+      this.initializeTypes();
+
+    });
+  }
+
+  initializeTypes() {
+    const getType = (value: any): EditableType => {
+      let type: EditableType;
+
+      console.log(value);
+
+      if (typeof value === 'number') {
+        type = 'Number';
+      } else if (typeof value === 'string') {
+        type = 'Text';
+      } else if (value instanceof Date) {
+        type = 'Date';
+      } else if (Lodash.isArray(value)) {
+        type = 'Table';
+      } else if (value instanceof Object) {
+        type = 'Object';
+      }
+
+      return type;
+    }
+
+    this.dataSource.data.forEach(row => {
+      Lodash.forOwn(row, (value: any, key: string) => {
+        if (this.options.columnTypes.find(column => column.name === key) === undefined) {
+          const type = getType(value);
+          this.options.columnTypes.push({ name: key, type: type });
+        }
+      });
+    });
+
+    this.options.columnTypes.forEach(columnType => {
+      if (columnType.type === 'Object') {
+        if (!columnType.options) {
+          columnType.options = {};
+        }
+        if (!(columnType.options as ObjectOptions).propertyTypes) {
+          (columnType.options as ObjectOptions).propertyTypes = [];
+        }
+
+        this.dataSource.data.forEach(element => {
+          Lodash.forOwn(element[columnType.name], (value: any, key: string) => {
+            if ((columnType.options as ObjectOptions).propertyTypes.find(property => property.name === key) === undefined) {
+              const type = getType(value);
+              (columnType.options as ObjectOptions).propertyTypes.push({ name: key, type: type });
+            }
+          });
+        });
+      }
+    });
   }
 
   get data() {
@@ -82,14 +121,21 @@ export class DataTableComponent implements OnInit {
   ngOnInit() {
     this.dataSource.sort = this.sort;
     setTimeout(() => this.dataSource.paginator = this.paginator, 0);
-    this.tableInfo.features = Object.assign({}, this.defaultFeatures, this.tableInfo.features);
+    this.options = Object.assign({}, this.defaultOptions, this.options);
+    if (this.options.columnTypes === undefined) {
+      this.options.columnTypes = [];
+    }
   }
 
-  onCellClick(editableValue: EditableValueComponent, column: string) {  
+  onSave() {
+    this.save.emit(this.data as object[]);
+  }
+
+  onCellClick(editableValue: EditableValueComponent, column: string) {
     if (
       this.openedEditableValue === undefined &&
-      this.tableInfo.features.edit !== false &&
-      (this.tableInfo.features.edit === true || (this.tableInfo.features.edit as any).indexOf(column) > -1)
+      this.options.editDisabled !== true &&
+      (this.options.editDisabled === false || (this.options.editDisabled as any).indexOf(column) > -1)
     ) {
       editableValue.open = true;
     }
@@ -98,20 +144,20 @@ export class DataTableComponent implements OnInit {
   onUpdate(row: object, column: string, value: any) {
     const update = new TableUpdate(Lodash.clone(row), column, value);
     row[column] = value;
-    this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), update));
+    this.modified.emit(update);
   }
 
   onInsert() {
     const dialogRef = this.dialog.open(EditableOpenObjectComponent, {
       width: '320px',
-      data: { value: {}, typeInfo: this.tableInfo.columnInfo, title: 'Insert' },
+      data: { value: {}, options: { propertyTypes: this.options.columnTypes } , title: 'Insert' },
       autoFocus: false,
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         this.dataSource.data.unshift(result);
-        this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableInsert(result)));
+        this.modified.emit(new TableInsert(result));
       }
       this.dataSource.data = this.dataSource.data;
     });
@@ -122,23 +168,14 @@ export class DataTableComponent implements OnInit {
       this.dataSource.data.splice(this.dataSource.data.indexOf(selected), 1);
     });
 
-    this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableDelete(this.selection.selected)));
+    this.modified.emit(new TableDelete(this.selection.selected));
 
     this.selection.clear();
     this.dataSource.data = this.dataSource.data;
   }
 
-  onModification(row: object, column: string, modification: TableModification) {
-    row[column] = modification.value;
-    this.modified.emit(new TableModification(Lodash.cloneDeep(this.data), new TableUpdate(row, column, modification)));
-  }
-
-  onSave() {
-    this.save.emit(Lodash.cloneDeep(this.data) as any);
-  }
-
-  onCancel() {
-    this.cancel.emit(Lodash.cloneDeep(this.data) as any);
+  onModification(row: object, column: string, modification: any) {
+    this.modified.emit(new TableUpdate(row, column, modification));
   }
 
   isAllSelected() {
@@ -154,8 +191,8 @@ export class DataTableComponent implements OnInit {
   }
 
   get columnsWithSelect() {
-    const columns = this.tableInfo.columnInfo.map(columnInfo => columnInfo.name);
-    if (this.tableInfo.features.select) {
+    const columns = this.options.columnTypes.map(columnInfo => columnInfo.name);
+    if (this.options.select) {
       columns.unshift('select');
     }
     return columns;
@@ -172,6 +209,5 @@ export class DataTableComponent implements OnInit {
 
     return editableValue2;
   }
-
 }
 

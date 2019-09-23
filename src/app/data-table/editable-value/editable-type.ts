@@ -1,19 +1,35 @@
-import { TableFeatures } from '../data-table/data-table.component';
-
 export type EditableType = 'Text' | 'Number' | 'Date' | 'Object' | 'Table';
 
-export class TextInfo {
+export type ColumnType = { name: string, type: EditableType, options?: TextOptions | ObjectOptions | TableOptions };
+export type PropertyType = ColumnType;
+
+export class TextOptions {
   options?: any[];
   map?: (value: any) => string;
   remap?: (originalValue: any, mappedValue: string) => any;
 }
 
-export class TableInfo {
-  columnInfo?: ColumnInfo;
-  features?: TableFeatures;
+export class ObjectOptions {
+  propertyTypes?: ColumnType[];
+  map?: (value: any) => string;
 }
 
-export type ObjectInfo = ColumnInfo;
+export class TableOptions {
+  columnTypes?: ColumnType[];
+  editDisabled?: Array<string> | boolean;
+  hiddenColumns?: Array<string>;
+  filter?: boolean;
+  select?: boolean;
+  insert?: boolean;
+  delete?: boolean;
+  pagination?: boolean;
+  save?: boolean;
+  close?: boolean;
 
-export type ColumnInfo = Array<{ name: string, type: EditableType, info?: TextInfo | ObjectInfo | TableInfo }>;
+  constructor(options?: TableOptions) {
+    Object.assign({}, this, options);
+  }
+}
+
+
 

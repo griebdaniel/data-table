@@ -23,6 +23,8 @@ import { FocusDirective } from './editable-value/focus.directive';
 import { EditableOpenTableComponent } from './editable-value/editable-table/editable-open-table/editable-open-table.component';
 import { EditableObjectComponent } from './editable-value/editable-object/editable-object.component';
 import { EditableOpenObjectComponent } from './editable-value/editable-object/editable-open-object/editable-open-object.component';
+import { EditableArrayComponent } from './editable-value/editable-array/editable-array.component';
+import { EditableOpenArrayComponent } from './editable-value/editable-array/editable-open-array/editable-open-array.component';
 
 
 @NgModule({
@@ -30,7 +32,7 @@ import { EditableOpenObjectComponent } from './editable-value/editable-object/ed
     DataTableComponent, EditableValueComponent, TableHeaderComponent,
     FocusDirective, CloseAutocompleteDirective, EditableTextComponent, EditableNumberComponent,
     EditableDateComponent, EditableTableComponent, EditableOpenTableComponent,
-    EditableObjectComponent, EditableOpenObjectComponent
+    EditableObjectComponent, EditableOpenObjectComponent, EditableArrayComponent, EditableOpenArrayComponent
   ],
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,

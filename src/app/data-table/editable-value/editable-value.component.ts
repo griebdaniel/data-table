@@ -1,9 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter, HostListener, ViewChildren, QueryList, ViewChild } from '@angular/core';
-import { EditableType, TextInfo, ColumnInfo, TableInfo } from './editable-type';
-import { ValueConverter } from '@angular/compiler/src/render3/view/template';
+import { EditableType, TextOptions, TableOptions, ObjectOptions } from './editable-type';
 import EditableValue from './editable-value';
-import { Observable } from 'rxjs';
-
+import * as Lodash from 'lodash';
 
 @Component({
   selector: 'app-editable-value',
@@ -12,12 +10,13 @@ import { Observable } from 'rxjs';
 })
 export class EditableValueComponent implements OnInit, EditableValue {
   @Input() type: EditableType;
-  @Input() typeInfo: TableInfo | TextInfo;
+  @Input() options: TextOptions | TableOptions | ObjectOptions;
   @Output() save = new EventEmitter<any>();
   @Output() cancel = new EventEmitter<void>();
   @Output() modified = new EventEmitter<any>();
 
-  _value: string | number | Date | object | object[]
+  private initialValue: string | number | Date | object | object[];
+  private cancelValue: string | number | Date | object | object[];
 
   @ViewChild('editableValue', { static: false }) editableValue: any;
 
@@ -26,15 +25,15 @@ export class EditableValueComponent implements OnInit, EditableValue {
   }
 
   onSave(value: any) {
-    this.save.emit(value);
+    this.cancelValue = Lodash.cloneDeep(value);
     this.editableValue.open = false;
+    this.save.emit(value);
   }
 
   onCancel(value: any) {
-    console.log('cancel emit')
-    this.cancel.emit(value);
-    this.editableValue.value = this._value;
+    this.editableValue.value = Lodash.cloneDeep(this.cancelValue);
     this.editableValue.open = false;
+    this.cancel.emit(value);
   }
 
   onModification(modification: any) {
@@ -53,7 +52,8 @@ export class EditableValueComponent implements OnInit, EditableValue {
   }
 
   @Input() set value(value: string | number | Date | object | object[]) {
-    this._value = value;
+    this.initialValue = Lodash.cloneDeep(value);
+    this.cancelValue = Lodash.cloneDeep(value);
     if (this.editableValue !== undefined) {
       this.editableValue.value = value;
     }

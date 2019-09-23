@@ -3,19 +3,18 @@ import EditableValue from '../editable-value';
 import { TableOptions } from '../editable-type';
 import { Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import { EditableOpenTableComponent } from './editable-open-table/editable-open-table.component';
-
+import { EditableOpenTableComponent } from '../editable-table/editable-open-table/editable-open-table.component';
 
 @Component({
-  selector: 'app-editable-table',
-  templateUrl: './editable-table.component.html',
-  styleUrls: ['./editable-table.component.scss']
+  selector: 'app-editable-array',
+  templateUrl: './editable-array.component.html',
+  styleUrls: ['./editable-array.component.scss']
 })
-export class EditableTableComponent implements OnInit, EditableValue {
+export class EditableArrayComponent implements OnInit {
   @Input() options: TableOptions;
-  @Input() value: object[];
+  @Input() value: any[];
 
-  @Output() save = new EventEmitter<object[]>(); 
+  @Output() save = new EventEmitter<any[]>(); 
   @Output() cancel = new EventEmitter<void>();
   @Output() modified = new EventEmitter<any>();
 
@@ -29,6 +28,8 @@ export class EditableTableComponent implements OnInit, EditableValue {
     this.tableModified.subscribe((modification) => {
       this.modified.emit(modification);
     });
+    this.value = this.value.map(value => { name: value });
+    console.log(this.value);
   }
 
   set open(open: boolean) {
@@ -38,7 +39,7 @@ export class EditableTableComponent implements OnInit, EditableValue {
     if (open === true) {
       this.dialogRef = this.dialog.open(EditableOpenTableComponent, {
         panelClass: 'table-dialog-container',
-        width: '100vw',
+        width: '50vw',
         data: { data: this.value, options: this.options, modified: this.tableModified },
         autoFocus: false,
         disableClose: true

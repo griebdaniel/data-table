@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import * as Lodash from 'lodash';
 
 @Component({
   selector: 'app-editable-date',
@@ -8,8 +7,10 @@ import * as Lodash from 'lodash';
   styleUrls: ['./editable-date.component.scss']
 })
 export class EditableDateComponent implements OnInit {
-  @Output() save = new EventEmitter<string>();
+  @Output() save = new EventEmitter<Date>();
   @Output() cancel = new EventEmitter();
+
+  initValue: Date;
 
   open = false;
   valueControl = new FormControl();
@@ -20,8 +21,9 @@ export class EditableDateComponent implements OnInit {
 
   }
 
-  @Input() set value(value: string) {
-    this.valueControl.setValue(Lodash.cloneDeep(value)); 
+  @Input() set value(value: Date) {
+    this.initValue = value;
+    this.valueControl.setValue(value); 
   };
 
   get value() {

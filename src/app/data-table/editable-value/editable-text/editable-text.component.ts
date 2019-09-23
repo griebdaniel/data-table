@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ElementRef, Output, EventEmitter } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { TextInfo } from '../editable-type';
+import { TextOptions } from '../editable-type';
 import { Observable } from 'rxjs';
 import { startWith, map } from 'rxjs/operators';
 import { TouchSequence } from 'selenium-webdriver';
@@ -11,10 +11,10 @@ import { TouchSequence } from 'selenium-webdriver';
   styleUrls: ['./editable-text.component.scss']
 })
 export class EditableTextComponent implements OnInit {
-  @Input() typeInfo: TextInfo;
+  @Input() options: TextOptions;
 
   @Output() save = new EventEmitter<string>();
-  @Output() cancel = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<string>();
 
   open = false;
   valueControl = new FormControl();
@@ -27,17 +27,17 @@ export class EditableTextComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.typeInfo) {
-      this.typeInfo = {};
+    if (!this.options) {
+      this.options = {};
     }
 
-    if (!this.typeInfo.map) {
-      this.typeInfo.map = (value) => value;
-      this.typeInfo.remap = (originalValue, mappedValue) => mappedValue;
+    if (!this.options.map) {
+      this.options.map = (value) => value;
+      this.options.remap = (originalValue, mappedValue) => mappedValue;
     }
 
-    if (!this.typeInfo.options) {
-      this.typeInfo.options = [];
+    if (!this.options.options) {
+      this.options.options = [];
     }
 
     this.filteredOptions = this.valueControl.valueChanges.pipe(
@@ -46,7 +46,7 @@ export class EditableTextComponent implements OnInit {
     );
 
     
-    this.valueControl.setValue(this.typeInfo.map(this._value));
+    this.valueControl.setValue(this.options.map(this._value));
 
   }
 
@@ -57,8 +57,8 @@ export class EditableTextComponent implements OnInit {
       this._value = value;
     }
 
-    if (this.typeInfo && this.typeInfo.map) {
-      value = this.typeInfo.map(value);
+    if (this.options && this.options.map) {
+      value = this.options.map(value);
     }
 
     this.valueControl.setValue(value);
@@ -70,12 +70,12 @@ export class EditableTextComponent implements OnInit {
 
   onSave() {
     let value = this.valueControl.value;
-    this._value = this.typeInfo.remap(this._value, value);
+    this._value = this.options.remap(this._value, value);
     this.save.emit(this._value);
   }
 
   private filter(value: string): string[] {
-    const options = this.typeInfo.options.map((option) => this.typeInfo.map(option))
+    const options = this.options.options.map((option) => this.options.map(option))
     const filterValue = value.toLowerCase();
     return options.filter((option: string) => option.toLowerCase().includes(filterValue));
   }

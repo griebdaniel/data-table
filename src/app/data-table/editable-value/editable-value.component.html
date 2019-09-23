@@ -1,16 +1,19 @@
 <div class="container" [ngSwitch]="type">
-  <app-editable-text #editableValue *ngSwitchCase="'Text'" [value]="_value" [typeInfo]="typeInfo" (save)="onSave($event)"
-    (cancel)="onCancel()" ></app-editable-text>
-  <app-editable-number #editableValue *ngSwitchCase="'Number'" [value]="_value" (save)="onSave($event)"
+  <app-editable-text #editableValue *ngSwitchCase="'Text'" [value]="initialValue" [options]="options"
+    (save)="onSave($event)" (cancel)="onCancel()"></app-editable-text>
+  <app-editable-number #editableValue *ngSwitchCase="'Number'" [value]="initialValue" (save)="onSave($event)"
     (cancel)="onCancel()">
   </app-editable-number>
-  <app-editable-date #editableValue *ngSwitchCase="'Date'" [value]="_value" (save)="onSave($event)"
+  <app-editable-date #editableValue *ngSwitchCase="'Date'" [value]="initialValue" (save)="onSave($event)"
     (cancel)="onCancel()">
   </app-editable-date>
-  <app-editable-object #editableValue *ngSwitchCase="'Object'" [value]="_value" [typeInfo]="typeInfo"
-    (cancel)="onCancel()" (save)="onSave($event)">
+  <app-editable-object #editableValue *ngSwitchCase="'Object'" [value]="initialValue" [options]="options"
+    (cancel)="onCancel()" (save)="onSave($event)" (modified)="onModification($event)">
   </app-editable-object>
-  <app-editable-table #editableValue *ngSwitchCase="'Table'" [value]="_value" [typeInfo]="typeInfo"
+  <app-editable-table #editableValue *ngSwitchCase="'Table'" [value]="initialValue" [options]="options"
     (cancel)="onCancel($event)" (save)="onSave($event)" (modified)="onModification($event)">
   </app-editable-table>
+  <app-editable-array #editableValue *ngSwitchCase="'Array'" [value]="initialValue" [options]="options"
+    (cancel)="onCancel($event)" (save)="onSave($event)" (modified)="onModification($event)">
+  </app-editable-array>
 </div>

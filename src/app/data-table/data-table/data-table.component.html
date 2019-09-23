@@ -1,13 +1,13 @@
 <div class="table-container">
-  <ng-container *ngIf="tableInfo.features.header">
-    <app-table-header [features]="tableInfo.features" (insert)="onInsert()" (delete)="onDelete()"
-      (filter)="this.dataSource.filter = $event" (close)="onCancel()" (save)="onSave()">
+  <ng-container>
+    <app-table-header [options]="options" (insert)="onInsert()" (delete)="onDelete()"
+      (filter)="this.dataSource.filter = $event" (close)="cancel.emit(data)" (save)="onSave()">
     </app-table-header>
     <mat-divider></mat-divider>
   </ng-container>
 
   <table mat-table matSort [dataSource]="dataSource">
-    <ng-container *ngIf="tableInfo.features.select" matColumnDef="select">
+    <ng-container *ngIf="options.select" matColumnDef="select">
       <th mat-header-cell *matHeaderCellDef>
         <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()"
           [indeterminate]="selection.hasValue() && !isAllSelected()">
@@ -20,26 +20,24 @@
       </td>
     </ng-container>
 
-    <ng-container *ngFor="let column of tableInfo.columnInfo; index as j">
+    <ng-container *ngFor="let column of options.columnTypes; index as j">
       <ng-container matColumnDef={{column.name}}>
-        <th mat-header-cell mat-sort-header *matHeaderCellDef [disabled]="!tableInfo.features.sort">
+        <th mat-header-cell mat-sort-header *matHeaderCellDef>
           {{column.name}} </th>
         <td (click)="onCellClick(editableValue, column.name)" mat-cell *matCellDef="let element; index as i">
           <div [style.position]="'relative'">
             <app-editable-value #editableValue [value]="element[column.name]" class="editable-value"
-              [type]="column.type" [typeInfo]="column.info"
+              [type]="column.type" [options]="column.options"
               [ngClass]="{'edit-active': column.type !== 'Table' && column.type !== 'Object' && editableValue.open}"
-              (save)="onUpdate(element, column.name, $event)" (modified)="onModification(element, column.name, $event)"
-              (cancel)="element[column.name]=$event">
+              (save)="onUpdate(element, column.name, $event)" (modified)="onModification(element, column.name, $event)">
             </app-editable-value>
           </div>
         </td>
       </ng-container>
     </ng-container>
-
     <tr mat-header-row *matHeaderRowDef="columnsWithSelect"></tr>
     <tr mat-row *matRowDef="let row; columns: columnsWithSelect;"></tr>
   </table>
-  <mat-paginator *ngIf="tableInfo.features.pagination" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons>
+  <mat-paginator *ngIf="options.pagination" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons>
   </mat-paginator>
 </div>

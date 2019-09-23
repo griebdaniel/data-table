@@ -1,12 +1,6 @@
 import { Component } from '@angular/core';
-import * as Lodash from 'lodash';
-// import { TableInfo } from './table/table-info';
-// import { EditableType } from './table/editable-value/editable-type';
 
-import { EditableType, ColumnInfo, TableInfo} from './data-table/editable-value/editable-type';
-
-import { Subject } from 'rxjs';
-import { TableUpdate, TableDelete, TableInsert } from './data-table/data-table/data-table.component';
+import { ColumnType, TableOptions} from './data-table/editable-value/editable-type';
 
 @Component({
   selector: 'app-root',
@@ -14,10 +8,9 @@ import { TableUpdate, TableDelete, TableInsert } from './data-table/data-table/d
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  saveConfirmation = new Subject<boolean>();
   data = [
     {
-      name: 'Order1',
+      name: undefined,
       date: new Date(),
       supplies: [
         { name: { name: 'Supply1' }, quantity: 1 },
@@ -26,10 +19,10 @@ export class AppComponent {
     }
   ];
 
-  productOrderInfo: TableInfo;
+  productOrderOptions: TableOptions;
 
   constructor() {
-    const supplierInfo: ColumnInfo = [
+    const supplierTypes: ColumnType[] = [
       { name: 'name', type: 'Text' },
       { name: 'phone', type: 'Number' },
     ]
@@ -41,19 +34,19 @@ export class AppComponent {
     const map = (value: any) => value.name;
     const remap = (originalValue: any, mappedValue: any) => options.find(option => map(option) === mappedValue);
 
-    const suppliesInfo: ColumnInfo = [
-      { name: 'name', type: 'Text', info: { map: map, remap: remap, options: options } },
+    const suppliesTypes: ColumnType[] = [
+      { name: 'name', type: 'Text', options: { map: map, remap: remap, options: options } },
       { name: 'quantity', type: 'Number' },
     ];
 
-    const productOrderColumnInfo: ColumnInfo = [
+    const productOrderTypes: ColumnType[] = [
       { name: 'name', type: 'Text' },
       { name: 'date', type: 'Date' },
-      { name: 'supplier', type: 'Object', info: supplierInfo },
-      { name: 'supplies', type: 'Table', info: { columnInfo: suppliesInfo } },
+      { name: 'supplier', type: 'Object', options: { propertyTypes: supplierTypes } },
+      { name: 'supplies', type: 'Table', options: { columnTypes: suppliesTypes } },
     ];
 
-    this.productOrderInfo  = { columnInfo: productOrderColumnInfo };
+    this.productOrderOptions  = { columnTypes: productOrderTypes };
   }
 
   onModification(modification: any) {

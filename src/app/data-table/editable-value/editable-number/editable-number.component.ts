@@ -16,7 +16,7 @@ export class EditableNumberComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.valueControl.setValue(this.value);
+
   }
 
   @Input() set value(value: string) {

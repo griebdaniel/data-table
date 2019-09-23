@@ -1,8 +1,14 @@
 import { Component, OnInit, Inject, Input, ViewChildren, QueryList } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { ColumnInfo } from '../../editable-type';
+import { ObjectOptions, EditableType } from '../../editable-type';
 import EditableValue from '../../editable-value';
 import * as Lodash from 'lodash';
+import { Subject } from 'rxjs';
+
+export class ObjectModification {
+  constructor(private property: string, private value: any) { }
+}
+
 
 @Component({
   selector: 'app-editable-open-object',
@@ -16,9 +22,8 @@ export class EditableOpenObjectComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<EditableOpenObjectComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { value: object, typeInfo: ColumnInfo, title: string }
+    @Inject(MAT_DIALOG_DATA) public data: { value: object, modified: Subject<ObjectModification>, options: ObjectOptions, title: string }
   ) {
-
   }
 
   ngOnInit(): void {
@@ -27,6 +32,7 @@ export class EditableOpenObjectComponent implements OnInit {
     } else {
       this.value = Lodash.cloneDeep(this.data.value);
     }
+
   }
 
   get openedEditableValue() {
@@ -46,4 +52,12 @@ export class EditableOpenObjectComponent implements OnInit {
       editableValue.open = true;
     }
   }
+
+  onSave(column: string, value: any) {
+    this.value[column] = value;
+    if (this.data.modified) {
+      this.data.modified.next(new ObjectModification(column, value));
+    }
+  }
+
 }
