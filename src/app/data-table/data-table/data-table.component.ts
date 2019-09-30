@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ViewChildren, QueryList, ViewChild, Output, EventEmitter, ElementRef, AfterViewInit, ComponentRef } from '@angular/core';
 import { EditableValueComponent } from '../editable-value/editable-value.component';
-import { TableOptions, EditableType, ObjectOptions } from '../editable-value/editable-type';
+import { TableOptions, EditableType, ObjectOptions, ColumnType, PropertyType } from '../editable-value/editable-type';
 import { MatTableDataSource, MatTable, MatSort, MatPaginator, MatDialog } from '@angular/material';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as Lodash from 'lodash';
@@ -57,17 +57,13 @@ export class DataTableComponent implements OnInit {
     data = Promise.resolve(data);
     data.then(data2 => {
       this.dataSource.data = data2 === undefined ? [] : data2;
-
       this.initializeTypes();
-
     });
   }
 
   initializeTypes() {
     const getType = (value: any): EditableType => {
       let type: EditableType;
-
-      console.log(value);
 
       if (typeof value === 'number') {
         type = 'Number';
@@ -84,34 +80,49 @@ export class DataTableComponent implements OnInit {
       return type;
     }
 
-    this.dataSource.data.forEach(row => {
-      Lodash.forOwn(row, (value: any, key: string) => {
-        if (this.options.columnTypes.find(column => column.name === key) === undefined) {
-          const type = getType(value);
-          this.options.columnTypes.push({ name: key, type: type });
-        }
-      });
-    });
+    const getTypes = (values: any[]): ColumnType[] => {
+      const types: ColumnType[] = [];
 
-    this.options.columnTypes.forEach(columnType => {
-      if (columnType.type === 'Object') {
-        if (!columnType.options) {
-          columnType.options = {};
-        }
-        if (!(columnType.options as ObjectOptions).propertyTypes) {
-          (columnType.options as ObjectOptions).propertyTypes = [];
-        }
-
-        this.dataSource.data.forEach(element => {
-          Lodash.forOwn(element[columnType.name], (value: any, key: string) => {
-            if ((columnType.options as ObjectOptions).propertyTypes.find(property => property.name === key) === undefined) {
-              const type = getType(value);
-              (columnType.options as ObjectOptions).propertyTypes.push({ name: key, type: type });
-            }
+      for (const value of values) {
+        if (getType(value) !== 'Object') {
+          types.push({ name: 'name', type: getType(value) });
+        } else {
+          Lodash.forOwn(value, (element, key) => {
+            types.push({ name: key, type: getType(element) });
           });
-        });
+        }
       }
-    });
+
+      for (const type of types) {
+        type.options = {};
+        if (type.type === 'Object') {
+          (<ObjectOptions>type.options).propertyTypes =
+            getTypes(values.reduce((accumulator, currentValue) => accumulator.push(currentValue[type.name]), []));;
+        } else if (type.type === 'Table' || type.type === 'Array') {
+          (<TableOptions>type.options).columnTypes =
+            getTypes(values.reduce((accumulator, currentValue) => accumulator.push(...currentValue[type.name]), []));
+        }
+      }
+
+      return types;
+    }
+
+
+
+    const mergeTypes = (userTypes: ColumnType[], inferredTypes: ColumnType[]) => {
+      for (const userType of userTypes) {
+        const inferredType = Lodash.find(inferredTypes, (inferredType) => inferredType.name === userType.name);
+        if (userType.type === 'Table' || userType.type === 'Array') {
+          mergeTypes((userType.options as TableOptions).columnTypes, (inferredType.options as TableOptions).columnTypes);
+        } else if (userType.type === 'Object') {
+          mergeTypes((userType.options as ObjectOptions).propertyTypes, (inferredType.options as ObjectOptions).propertyTypes);
+        }
+        const diff = Lodash.differenceWith(<ColumnType[]>inferredTypes, userTypes, (a, b) => a.name === b.name);
+        userTypes.push(...diff);
+      }
+    }
+
+    mergeTypes(this.options.columnTypes, getTypes(this.dataSource.data));
   }
 
   get data() {
@@ -150,7 +161,7 @@ export class DataTableComponent implements OnInit {
   onInsert() {
     const dialogRef = this.dialog.open(EditableOpenObjectComponent, {
       width: '320px',
-      data: { value: {}, options: { propertyTypes: this.options.columnTypes } , title: 'Insert' },
+      data: { value: {}, options: { propertyTypes: this.options.columnTypes }, title: 'Insert' },
       autoFocus: false,
     });
 
