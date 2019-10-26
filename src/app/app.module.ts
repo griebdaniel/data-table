@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { DataTableModule } from './data-table/data-table.module'
 import { EditableOpenTableComponent } from './data-table/editable-value/editable-table/editable-open-table/editable-open-table.component';
 import { EditableOpenObjectComponent } from './data-table/editable-value/editable-object/editable-open-object/editable-open-object.component';
+import { EditableOpenArrayComponent } from './data-table/editable-value/editable-array/editable-open-array/editable-open-array.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,6 @@ import { EditableOpenObjectComponent } from './data-table/editable-value/editabl
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [EditableOpenTableComponent, EditableOpenObjectComponent]
+  entryComponents: [EditableOpenTableComponent, EditableOpenObjectComponent, EditableOpenArrayComponent]
 })
 export class AppModule { }

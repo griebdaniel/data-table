@@ -25,6 +25,7 @@ import { EditableObjectComponent } from './editable-value/editable-object/editab
 import { EditableOpenObjectComponent } from './editable-value/editable-object/editable-open-object/editable-open-object.component';
 import { EditableArrayComponent } from './editable-value/editable-array/editable-array.component';
 import { EditableOpenArrayComponent } from './editable-value/editable-array/editable-open-array/editable-open-array.component';
+import { EditableBooleanComponent } from './editable-value/editable-boolean/editable-boolean.component';
 
 
 @NgModule({
@@ -32,7 +33,7 @@ import { EditableOpenArrayComponent } from './editable-value/editable-array/edit
     DataTableComponent, EditableValueComponent, TableHeaderComponent,
     FocusDirective, CloseAutocompleteDirective, EditableTextComponent, EditableNumberComponent,
     EditableDateComponent, EditableTableComponent, EditableOpenTableComponent,
-    EditableObjectComponent, EditableOpenObjectComponent, EditableArrayComponent, EditableOpenArrayComponent
+    EditableObjectComponent, EditableOpenObjectComponent, EditableArrayComponent, EditableOpenArrayComponent, EditableBooleanComponent
   ],
   imports: [
     CommonModule, FormsModule, ReactiveFormsModule,

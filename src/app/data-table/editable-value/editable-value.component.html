@@ -16,4 +16,7 @@
   <app-editable-array #editableValue *ngSwitchCase="'Array'" [value]="initialValue" [options]="options"
     (cancel)="onCancel($event)" (save)="onSave($event)" (modified)="onModification($event)">
   </app-editable-array>
+  <app-editable-boolean #editableValue *ngSwitchCase="'Boolean'" [value]="initialValue" (save)="onSave($event)"
+    (cancel)="onCancel()">
+  </app-editable-boolean>
 </div>

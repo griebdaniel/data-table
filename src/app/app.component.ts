@@ -13,9 +13,9 @@ export class AppComponent {
       name: undefined,
       date: new Date(),
       supplies: [
-        { name: { name: 'Supply1' }, quantity: 1 },
+        { name: { name: 'Supply1' }, quantity: 1, expensive: false },
       ],
-      supplier: { name: 'Supplier1', phone: '0740000000' }
+      supplier: { name: 'Supplier1', phone: '0740000000', addresses: ['address1', 'address2'] }
     }
   ];
 

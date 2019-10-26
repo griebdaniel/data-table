@@ -53,10 +53,16 @@ export class EditableOpenObjectComponent implements OnInit {
     }
   }
 
-  onSave(column: string, value: any) {
-    this.value[column] = value;
+  onSave(property: string, value: any) {
+    this.value[property] = value;
     if (this.data.modified) {
-      this.data.modified.next(new ObjectModification(column, value));
+      this.data.modified.next(new ObjectModification(property, value));
+    }
+  }
+
+  onModification(property: string, event: any) {
+    if (this.data.modified) {
+      this.data.modified.next(new ObjectModification(property, event));
     }
   }
 

@@ -69,10 +69,22 @@ export class DataTableComponent implements OnInit {
         type = 'Number';
       } else if (typeof value === 'string') {
         type = 'Text';
+      } else if (typeof value === 'boolean') {
+        type ='Boolean';
       } else if (value instanceof Date) {
         type = 'Date';
       } else if (Lodash.isArray(value)) {
-        type = 'Table';
+        for (const value2 of value) {
+          if (value2) {
+            if (Lodash.isObject(value2) && !(value2 instanceof Date)) {
+              type = 'Table';
+            } else {
+              type = 'Array';
+            }
+            break;
+          }
+        }
+
       } else if (value instanceof Object) {
         type = 'Object';
       }
@@ -85,41 +97,59 @@ export class DataTableComponent implements OnInit {
 
       for (const value of values) {
         if (getType(value) !== 'Object') {
-          types.push({ name: 'name', type: getType(value) });
+          if (types.length === 0 && getType(value) !== undefined) {
+            types.push({ name: 'name', type: getType(value) });
+          }
         } else {
           Lodash.forOwn(value, (element, key) => {
-            types.push({ name: key, type: getType(element) });
-          });
-        }
-      }
+            const type = { name: key, type: getType(element), options: {} };
 
-      for (const type of types) {
-        type.options = {};
-        if (type.type === 'Object') {
-          (<ObjectOptions>type.options).propertyTypes =
-            getTypes(values.reduce((accumulator, currentValue) => accumulator.push(currentValue[type.name]), []));;
-        } else if (type.type === 'Table' || type.type === 'Array') {
-          (<TableOptions>type.options).columnTypes =
-            getTypes(values.reduce((accumulator, currentValue) => accumulator.push(...currentValue[type.name]), []));
+            if (type.type === 'Object') {
+              (type.options as ObjectOptions).propertyTypes =
+                getTypes(values.reduce((accumulator, currentValue) => {
+                  accumulator.push(currentValue[type.name])
+                  return accumulator;
+                }, []));
+            } else if (type.type === 'Table' || type.type === 'Array') {
+              (type.options as TableOptions).columnTypes =
+                getTypes(values.reduce((accumulator, currentValue) => {
+                  accumulator.push(...currentValue[type.name]);
+                  return accumulator
+                }, []));
+            }
+            if (!Lodash.find(types, (type2) => type2.name === type.name) && type.type !== undefined) {
+              types.push(type);
+            }
+          });
         }
       }
 
       return types;
     }
 
-
-
     const mergeTypes = (userTypes: ColumnType[], inferredTypes: ColumnType[]) => {
       for (const userType of userTypes) {
         const inferredType = Lodash.find(inferredTypes, (inferredType) => inferredType.name === userType.name);
+
+        if (!userType.options) {
+          userType.options = {};
+        }
+
         if (userType.type === 'Table' || userType.type === 'Array') {
+          if (!(userType.options as TableOptions).columnTypes) {
+            (userType.options as TableOptions).columnTypes = [];
+          }
           mergeTypes((userType.options as TableOptions).columnTypes, (inferredType.options as TableOptions).columnTypes);
         } else if (userType.type === 'Object') {
+          if (!(userType.options as ObjectOptions).propertyTypes) {
+            (userType.options as ObjectOptions).propertyTypes = [];
+          }
           mergeTypes((userType.options as ObjectOptions).propertyTypes, (inferredType.options as ObjectOptions).propertyTypes);
         }
-        const diff = Lodash.differenceWith(<ColumnType[]>inferredTypes, userTypes, (a, b) => a.name === b.name);
-        userTypes.push(...diff);
       }
+
+      const diff = Lodash.differenceWith(<ColumnType[]>inferredTypes, userTypes, (a, b) => a.name === b.name);
+      userTypes.push(...diff);
     }
 
     mergeTypes(this.options.columnTypes, getTypes(this.dataSource.data));
@@ -136,10 +166,6 @@ export class DataTableComponent implements OnInit {
     if (this.options.columnTypes === undefined) {
       this.options.columnTypes = [];
     }
-  }
-
-  onSave() {
-    this.save.emit(this.data as object[]);
   }
 
   onCellClick(editableValue: EditableValueComponent, column: string) {

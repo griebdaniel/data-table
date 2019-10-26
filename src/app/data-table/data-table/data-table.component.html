@@ -1,7 +1,7 @@
 <div class="table-container">
   <ng-container>
     <app-table-header [options]="options" (insert)="onInsert()" (delete)="onDelete()"
-      (filter)="this.dataSource.filter = $event" (close)="cancel.emit(data)" (save)="onSave()">
+      (filter)="this.dataSource.filter = $event" (close)="cancel.emit(data)" (save)="save.emit(data)">
     </app-table-header>
     <mat-divider></mat-divider>
   </ng-container>

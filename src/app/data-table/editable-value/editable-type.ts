@@ -1,4 +1,4 @@
-export type EditableType = 'Text' | 'Number' | 'Date' | 'Object' | 'Array' | 'Table';
+export type EditableType = 'Text' | 'Number' | 'Boolean' | 'Date' | 'Object' | 'Array' | 'Table';
 
 export type ColumnType = { name: string, type: EditableType, options?: TextOptions | ObjectOptions | TableOptions };
 export type PropertyType = ColumnType;

@@ -15,14 +15,17 @@ export class EditableOpenArrayComponent implements OnInit {
   @ViewChild('table', { static: false }) table: DataTableComponent;
 
   constructor(public dialogRef: MatDialogRef<EditableOpenArrayComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { data: object[], options: TableOptions, modified: Subject<any> }) { }
+    @Inject(MAT_DIALOG_DATA) public data: { data: any[], options: TableOptions, modified: Subject<any> }) {
+
+  }
 
   ngOnInit() {
+    this.data.data = this.data.data.map(data => { return { name: data } });
     this.data.options = Object.assign({}, this.data.options, { save: true, close: true });
   }
 
   onSave(value: any) {
-    this.dialogRef.close(value);
+    this.dialogRef.close(value.map((data: any) => data.name));
   }
 
   onModification(modification: any) {

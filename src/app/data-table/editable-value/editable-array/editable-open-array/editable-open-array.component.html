@@ -1,1 +1,7 @@
-<p>editable-open-array works!</p>
+<div class="dialog-container">
+    <div mat-dialog-content class="container">
+        <app-data-table #table [data]="data.data" [options]="data.options" (modified)="onModification($event)"
+            (save)="onSave($event)" (cancel)="dialogRef.close()">
+        </app-data-table>
+    </div>
+</div>

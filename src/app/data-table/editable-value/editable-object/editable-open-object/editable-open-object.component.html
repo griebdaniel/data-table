@@ -12,7 +12,8 @@
       <div (click)="openEditableValue(editableValue)" class="value-container">
         <app-editable-value #editableValue
           [ngClass]="{'edit-active': editableValue.open, 'edit-inactive': !editableValue.open}"
-          [value]="value[propertyType.name]" [type]="propertyType.type" [options]="propertyType.options" (save)="onSave(propertyType.name, $event)">
+          [value]="value[propertyType.name]" [type]="propertyType.type" [options]="propertyType.options"
+          (modified)="onModification(propertyType.name, $event)" (save)="onSave(propertyType.name, $event)">
         </app-editable-value>
       </div>
     </div>
