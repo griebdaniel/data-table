@@ -1,0 +1,22 @@
+<div class="container" [ngSwitch]="type">
+  <gdr-editable-text #editableValue *ngSwitchCase="'Text'" [value]="initialValue" [options]="options"
+    (save)="onSave($event)" (cancel)="onCancel($event)"></gdr-editable-text>
+  <gdr-editable-number #editableValue *ngSwitchCase="'Number'" [value]="initialValue" (save)="onSave($event)"
+    (cancel)="onCancel($event)">
+  </gdr-editable-number>
+  <gdr-editable-date #editableValue *ngSwitchCase="'Date'" [value]="initialValue" (save)="onSave($event)"
+    (cancel)="onCancel($event)">
+  </gdr-editable-date>
+  <gdr-editable-object #editableValue *ngSwitchCase="'Object'" [value]="initialValue" [options]="options"
+    (cancel)="onCancel($event)" (save)="onSave($event)" (modified)="onModification($event)">
+  </gdr-editable-object>
+  <gdr-editable-table #editableValue *ngSwitchCase="'Table'" [value]="initialValue" [options]="options"
+    (cancel)="onCancel($event)" (save)="onSave($event)" (modified)="onModification($event)">
+  </gdr-editable-table>
+  <gdr-editable-array #editableValue *ngSwitchCase="'Array'" [value]="initialValue" [options]="options"
+    (cancel)="onCancel($event)" (save)="onSave($event)" (modified)="onModification($event)">
+  </gdr-editable-array>
+  <gdr-editable-boolean #editableValue *ngSwitchCase="'Boolean'" [value]="initialValue" (save)="onSave($event)"
+    (cancel)="onCancel($event)">
+  </gdr-editable-boolean>
+</div>
