@@ -48,7 +48,17 @@ export class DataTableComponent implements OnInit {
       delete: true,
       cancel: false,
       save: false,
+      hiddenColumns: [],
     };
+  }
+
+  ngOnInit() {
+    this.dataSource.sort = this.sort;
+    setTimeout(() => this.dataSource.paginator = this.paginator, 0);
+    this.options = Object.assign({}, this.defaultOptions, this.options);
+    if (this.options.columnTypes === undefined) {
+      this.options.columnTypes = [];
+    }
   }
 
   @Input() set data(data: any) {
@@ -138,6 +148,10 @@ export class DataTableComponent implements OnInit {
           userType.options = {};
         }
 
+        if (!inferredType) {
+          continue;
+        }
+
         if (userType.type === 'Table' || userType.type === 'Array') {
           if (!(userType.options as TableOptions).columnTypes) {
             (userType.options as TableOptions).columnTypes = [];
@@ -156,16 +170,6 @@ export class DataTableComponent implements OnInit {
     };
 
     mergeTypes(this.options.columnTypes, getTypes(this.dataSource.data));
-  }
-
-
-  ngOnInit() {
-    this.dataSource.sort = this.sort;
-    setTimeout(() => this.dataSource.paginator = this.paginator, 0);
-    this.options = Object.assign({}, this.defaultOptions, this.options);
-    if (this.options.columnTypes === undefined) {
-      this.options.columnTypes = [];
-    }
   }
 
   onCellClick(editableValue: EditableValueComponent, column: string) {
@@ -229,9 +233,12 @@ export class DataTableComponent implements OnInit {
 
   get columnsWithSelect() {
     const columns = this.options.columnTypes.map(columnInfo => columnInfo.name);
+
     if (this.options.select) {
       columns.unshift('select');
     }
+
+    Lodash.remove(columns, (column) => this.options.hiddenColumns.find((hiddenColumn) => column === hiddenColumn) !== undefined);
     return columns;
   }
 

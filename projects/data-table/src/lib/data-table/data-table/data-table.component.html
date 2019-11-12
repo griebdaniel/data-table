@@ -28,7 +28,7 @@
           <div [style.position]="'relative'">
             <gdr-editable-value #editableValue [value]="element[column.name]" class="editable-value"
               [type]="column.type" [options]="column.options"
-              [ngClass]="{'edit-active': column.type !== 'Table' && column.type !== 'Object' && editableValue.open}"
+              [ngClass]="{'edit-active': column.type !== 'Table' && column.type !== 'Object' && column.type !== 'Array' && editableValue.open}"
               (save)="onUpdate(element, column.name, $event)" (modified)="onModification(element, column.name, $event)">
             </gdr-editable-value>
           </div>
@@ -38,6 +38,6 @@
     <tr mat-header-row *matHeaderRowDef="columnsWithSelect"></tr>
     <tr mat-row *matRowDef="let row; columns: columnsWithSelect;"></tr>
   </table>
-  <mat-paginator *ngIf="options.pagination" [pageSizeOptions]="[4, 8, 12]" showFirstLastButtons>
+  <mat-paginator *ngIf="options.pagination" [pageSizeOptions]="[12, 16, 20]" showFirstLastButtons>
   </mat-paginator>
 </div>

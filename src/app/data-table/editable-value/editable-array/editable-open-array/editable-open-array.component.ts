@@ -24,10 +24,15 @@ export class EditableOpenArrayComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   ngOnInit() {
+    if (!this.data.data) {
+      this.data.data = [];
+    }
+
     this.data.data = this.data.data.map(data => {
       return { name: data };
     });
-    this.data.options = Object.assign({}, this.data.options, { save: true, close: true });
+
+    this.data.options = Object.assign({}, { save: true, cancel: true }, this.data.options);
   }
 
   onSave(value: any) {

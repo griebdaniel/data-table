@@ -5,11 +5,13 @@ import { Subject } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { EditableOpenTableComponent } from './editable-open-table/editable-open-table.component';
 
+import {ViewEncapsulation} from '@angular/core';
+
 
 @Component({
   selector: 'gdr-editable-table',
   templateUrl: './editable-table.component.html',
-  styleUrls: ['./editable-table.component.scss']
+  styleUrls: ['./editable-table.component.scss'],
 })
 export class EditableTableComponent implements OnInit, EditableValue {
   @Input() options: TableOptions;
@@ -33,7 +35,6 @@ export class EditableTableComponent implements OnInit, EditableValue {
 
   set open(open: boolean) {
     this.open2 = open;
-    this.options = Object.assign({}, this.options, { save: true, close: true });
 
     if (open === true) {
       this.dialogRef = this.dialog.open(EditableOpenTableComponent, {

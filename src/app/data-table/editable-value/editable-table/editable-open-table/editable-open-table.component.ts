@@ -23,7 +23,7 @@ export class EditableOpenTableComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: DialogData) { }
 
   ngOnInit() {
-    this.data.options = Object.assign({}, this.data.options, { save: true, cancel: true });
+    this.data.options = Object.assign({}, { save: true, cancel: true }, this.data.options);
   }
 
   onSave(value: any) {

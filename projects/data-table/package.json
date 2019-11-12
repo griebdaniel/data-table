@@ -1,8 +1,16 @@
 {
-  "name": "data-table",
-  "version": "0.0.1",
+  "name": "gdr-data-table",
+  "version": "0.0.42",
   "peerDependencies": {
     "@angular/common": "^8.2.11",
-    "@angular/core": "^8.2.11"
+    "@angular/core": "^8.2.11",
+    "@angular/material": "^8.2.3",
+    "@angular/cdk": "~8.2.3",
+    "hammerjs": "^2.0.8",
+    "lodash": "^4.17.15"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/griebdr/data-table.git"
   }
 }
