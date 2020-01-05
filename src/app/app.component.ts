@@ -10,6 +10,7 @@ export class AppComponent {
   userData = [{
     name: 'daniel',
     age: 25,
+    date: new Date(),
     hobbies: ['chess', 'swimming', 'running'],
     activities: [
       { name: { name: 'sightseeing', price: 100 }, date: new Date(), location: { city: 'cluj', street: 'republicii' } },
@@ -34,8 +35,9 @@ export class AppComponent {
     this.options.columnTypes = [
       { name: 'name', type: 'Text'},
       { name: 'age', type: 'Number' },
-      { name: 'activities', type: 'Table', options: activitiesOptions },
-      { name: 'hobbies', type: 'Array', options: hobbiesOptions }
+      { name: 'date', type: 'Date' },
+      // { name: 'activities', type: 'Table', options: activitiesOptions },
+      // { name: 'hobbies', type: 'Array', options: hobbiesOptions }
     ];
   }
 

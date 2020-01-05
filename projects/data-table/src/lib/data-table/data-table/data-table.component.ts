@@ -6,16 +6,9 @@ import { SelectionModel } from '@angular/cdk/collections';
 import * as Lodash from 'lodash';
 import { EditableOpenObjectComponent } from '../editable-value/editable-object/editable-open-object/editable-open-object.component';
 
-export class TableInsert {
-  constructor(public rows: object) { }
-}
-
-export class TableDelete {
-  constructor(public rows: object[]) { }
-}
-
-export class TableUpdate {
-  constructor(public row: object, public column: string, public value: any) { }
+export class TableModification {
+  type: 'insert' | 'update' | 'delete';
+  modification: any;
 }
 
 @Component({
@@ -30,7 +23,7 @@ export class DataTableComponent implements OnInit {
   @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
   @Input() options: TableOptions;
-  @Output() modified = new EventEmitter<TableUpdate | TableInsert | TableDelete>();
+  @Output() modified = new EventEmitter<TableModification>();
   @Output() save = new EventEmitter<object[]>();
   @Output() cancel = new EventEmitter<object[]>();
 
@@ -65,7 +58,7 @@ export class DataTableComponent implements OnInit {
     data = Promise.resolve(data);
     data.then((data2: object[]) => {
       this.dataSource.data = data2 === undefined ? [] : data2;
-      this.initializeTypes();
+      // this.initializeTypes();
     });
   }
 
@@ -183,7 +176,11 @@ export class DataTableComponent implements OnInit {
   }
 
   onUpdate(row: object, column: string, value: any) {
-    const update = new TableUpdate(Lodash.clone(row), column, value);
+    const update = {
+      type: 'update' as any,
+      modification: { row: Lodash.clone(row), column, value }
+    };
+
     row[column] = value;
     this.modified.emit(update);
   }
@@ -198,7 +195,7 @@ export class DataTableComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result !== undefined) {
         this.dataSource.data.unshift(result);
-        this.modified.emit(new TableInsert(result));
+        this.modified.emit({ type: 'insert', modification: result });
       }
       this.dataSource.data = this.dataSource.data;
     });
@@ -209,14 +206,14 @@ export class DataTableComponent implements OnInit {
       this.dataSource.data.splice(this.dataSource.data.indexOf(selected), 1);
     });
 
-    this.modified.emit(new TableDelete(this.selection.selected));
+    this.modified.emit({ type: 'delete', modification: this.selection.selected });
 
     this.selection.clear();
     this.dataSource.data = this.dataSource.data;
   }
 
   onModification(row: object, column: string, modification: any) {
-    this.modified.emit(new TableUpdate(row, column, modification));
+    this.modified.emit({ type: 'update', modification: { row, column, value: modification } });
   }
 
   isAllSelected() {

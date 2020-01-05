@@ -6,7 +6,7 @@
   </mat-form-field>
   <div class="action-buttons">
     <button mat-button color="primary" (click)="$event.stopPropagation(); cancel.emit()">CANCEL</button>
-    <button mat-button color="primary" (click)="$event.stopPropagation(); save.emit(valueControl.value)">SAVE</button>
+    <button mat-button color="primary" (click)="$event.stopPropagation(); save.emit(this.valueControl.value)">SAVE</button>
   </div>
 </div>
 <ng-template #closed>
